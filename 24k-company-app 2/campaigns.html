@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24K Company — Campanhas</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .period-selector { display:flex; gap:8px; margin-bottom:24px; }
+  .period-btn { padding:8px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:99px; font-size:13px; color:var(--text-secondary); cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif; }
+  .period-btn.active { background:var(--gold-muted); border-color:var(--gold); color:var(--gold); }
+
+  .chart-grid { display:grid; grid-template-columns:3fr 2fr; gap:20px; margin-bottom:24px; }
+
+  .campaign-row { display:flex; align-items:center; gap:16px; padding:16px 20px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:8px; transition:all 0.2s; }
+  .campaign-row:hover { border-color:var(--gold-border); }
+  .campaign-platform { width:36px; height:36px; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .campaign-name { flex:1; }
+  .campaign-title { font-size:14px; font-weight:500; color:var(--text-primary); }
+  .campaign-sub { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .campaign-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:0; text-align:center; }
+  .camp-metric { padding:0 16px; border-left:1px solid var(--border); }
+  .camp-metric:first-child { border-left:none; }
+  .camp-metric-val { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:var(--text-primary); }
+  .camp-metric-lbl { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-top:2px; }
+
+  .ai-report { background:linear-gradient(135deg,var(--bg-card) 0%,rgba(212,175,55,0.05) 100%); border:1px solid var(--border-gold); border-radius:var(--radius-lg); padding:24px; margin-bottom:24px; }
+  .ai-report-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+  .ai-report-avatar { width:36px; height:36px; background:linear-gradient(135deg,var(--gold-dark),var(--gold)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; color:#000; font-weight:700; }
+  .ai-report-title { font-size:15px; font-weight:600; color:var(--text-primary); }
+  .ai-report-sub { font-size:12px; color:var(--text-muted); }
+  .ai-report-body { font-size:14px; color:var(--text-secondary); line-height:1.7; }
+  .ai-insight { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+  .ai-insight:last-child { border-bottom:none; }
+  .ai-insight-icon { color:var(--gold); font-size:14px; flex-shrink:0; margin-top:1px; }
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Campanhas</div>
+        <div class="topbar-subtitle">Performance em tempo real — Meta Ads + Google Ads</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-outline btn-sm">📥 Exportar PDF</button>
+        <div class="icon-btn"><span>🔔</span><div class="notif-dot"></div></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- Period Selector -->
+      <div class="period-selector">
+        <button class="period-btn active" onclick="switchPeriod(this)">7 dias</button>
+        <button class="period-btn" onclick="switchPeriod(this)">30 dias</button>
+        <button class="period-btn" onclick="switchPeriod(this)">90 dias</button>
+        <button class="period-btn" onclick="switchPeriod(this)">Este mês</button>
+      </div>
+
+      <!-- KPIs -->
+      <div class="stats-grid mb-24">
+        <div class="metric-card gold">
+          <div class="metric-label">Investimento Total</div>
+          <div class="metric-value">R$8.240</div>
+          <div class="metric-sub">Últimos 30 dias</div>
+          <div class="metric-trend trend-up">↑ 12% vs período anterior</div>
+        </div>
+        <div class="metric-card green">
+          <div class="metric-label">Receita Gerada</div>
+          <div class="metric-value">R$34.600</div>
+          <div class="metric-sub">Conversões atribuídas</div>
+          <div class="metric-trend trend-up">↑ 31% vs período anterior</div>
+        </div>
+        <div class="metric-card blue">
+          <div class="metric-label">ROAS Consolidado</div>
+          <div class="metric-value">4.2x</div>
+          <div class="metric-sub">Meta: 3.5x</div>
+          <div class="metric-trend trend-up">↑ Acima da meta ✓</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Conversões</div>
+          <div class="metric-value">347</div>
+          <div class="metric-sub">Vendas + Leads convertidos</div>
+          <div class="metric-trend trend-up">↑ 18% vs período anterior</div>
+        </div>
+      </div>
+
+      <!-- AI Report -->
+      <div class="ai-report">
+        <div class="ai-report-header">
+          <div class="ai-report-avatar">IA</div>
+          <div>
+            <div class="ai-report-title">Análise Semanal da IA</div>
+            <div class="ai-report-sub">Gerado automaticamente em 14/04/2025</div>
+          </div>
+          <div class="badge badge-gold" style="margin-left:auto">Nova análise</div>
+        </div>
+        <div class="ai-report-body">
+          <div class="ai-insight">
+            <div class="ai-insight-icon">↑</div>
+            <div>Suas campanhas de <strong>Leads no Meta Ads</strong> tiveram crescimento de 23% no volume com queda de 18% no CPL — isso indica que os públicos segmentados estão mais qualificados. Continue escalando o Conjunto 2 (lookalike 1%).</div>
+          </div>
+          <div class="ai-insight">
+            <div class="ai-insight-icon">⚠</div>
+            <div>O anúncio <strong>"Criativo B – Video 15s"</strong> está com frequência acima de 4.2 para o público frio. Recomendo pausar ou trocar o criativo nos próximos 3 dias para evitar fadiga de anúncio.</div>
+          </div>
+          <div class="ai-insight">
+            <div class="ai-insight-icon">✦</div>
+            <div>O <strong>Google Ads – Campanha de Search</strong> apresentou ROAS de 6.1x nos últimos 7 dias. Oportunidade de aumentar o CPC alvo para capturar mais volume com rentabilidade.</div>
+          </div>
+          <div class="ai-insight">
+            <div class="ai-insight-icon">↓</div>
+            <div>Queda de 12% nas conversões no <strong>sábado e domingo</strong>. Sugestão: ajustar programação de anúncios para concentrar mais budget de Quinta a Sábado (horários de pico identificados: 18h–21h).</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Investimento vs Receita Diária</div>
+          </div>
+          <canvas id="investChart" height="200"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Distribuição por Plataforma</div>
+          </div>
+          <canvas id="platformChart" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Campaigns Table -->
+      <div class="section-header mt-24 mb-16">
+        <div>
+          <div class="section-title">Campanhas Ativas</div>
+          <div class="section-subtitle">Desempenho individual por campanha</div>
+        </div>
+        <span class="badge badge-active">● Live</span>
+      </div>
+
+      <div class="campaign-row">
+        <div class="campaign-platform" style="background:rgba(24,119,242,0.1)">📘</div>
+        <div class="campaign-name">
+          <div class="campaign-title">Meta — Geração de Leads · Público Frio</div>
+          <div class="campaign-sub">Conjunto 1 · Interesses · R$150/dia</div>
+        </div>
+        <div class="campaign-metrics">
+          <div class="camp-metric"><div class="camp-metric-val">R$2.100</div><div class="camp-metric-lbl">Investido</div></div>
+          <div class="camp-metric"><div class="camp-metric-val text-success">412</div><div class="camp-metric-lbl">Leads</div></div>
+          <div class="camp-metric"><div class="camp-metric-val">R$5,10</div><div class="camp-metric-lbl">CPL</div></div>
+          <div class="camp-metric"><div class="camp-metric-val text-gold">3.8x</div><div class="camp-metric-lbl">ROAS</div></div>
+        </div>
+        <span class="badge badge-approved">Ativa</span>
+      </div>
+
+      <div class="campaign-row">
+        <div class="campaign-platform" style="background:rgba(24,119,242,0.1)">📘</div>
+        <div class="campaign-name">
+          <div class="campaign-title">Meta — Conversão de Vendas · Lookalike 1%</div>
+          <div class="campaign-sub">Conjunto 2 · Lookalike · R$200/dia</div>
+        </div>
+        <div class="campaign-metrics">
+          <div class="camp-metric"><div class="camp-metric-val">R$2.800</div><div class="camp-metric-lbl">Investido</div></div>
+          <div class="camp-metric"><div class="camp-metric-val text-success">89</div><div class="camp-metric-lbl">Vendas</div></div>
+          <div class="camp-metric"><div class="camp-metric-val">R$31,46</div><div class="camp-metric-lbl">CPA</div></div>
+          <div class="camp-metric"><div class="camp-metric-val text-gold">4.9x</div><div class="camp-metric-lbl">ROAS</div></div>
+        </div>
+        <span class="badge badge-approved">Ativa</span>
+      </div>
+
+      <div class="campaign-row">
+        <div class="campaign-platform" style="background:rgba(234,67,53,0.1)">🔍</div>
+        <div class="campaign-name">
+          <div class="campaign-title">Google — Search · Palavras-chave de Intenção</div>
+          <div class="campaign-sub">Campanha de Marca + Produto · R$100/dia</div>
+        </div>
+        <div class="campaign-metrics">
+          <div class="camp-metric"><div class="camp-metric-val">R$1.400</div><div class="camp-metric-lbl">Investido</div></div>
+          <div class="camp-metric"><div class="camp-metric-val text-success">167</div><div class="camp-metric-lbl">Conversões</div></div>
+          <div class="camp-metric"><div class="camp-metric-val">R$8,38</div><div class="camp-metric-lbl">CPA</div></div>
+          <div class="camp-metric"><div class="camp-metric-val text-gold">6.1x</div><div class="camp-metric-lbl">ROAS</div></div>
+        </div>
+        <span class="badge badge-approved">Ativa</span>
+      </div>
+
+      <div class="campaign-row">
+        <div class="campaign-platform" style="background:rgba(24,119,242,0.1)">🔁</div>
+        <div class="campaign-name">
+          <div class="campaign-title">Meta — Retargeting · Visitantes Site</div>
+          <div class="campaign-sub">Audiência Custom · Últimos 30 dias · R$50/dia</div>
+        </div>
+        <div class="campaign-metrics">
+          <div class="camp-metric"><div class="camp-metric-val">R$940</div><div class="camp-metric-lbl">Investido</div></div>
+          <div class="camp-metric"><div class="camp-metric-val text-success">91</div><div class="camp-metric-lbl">Conversões</div></div>
+          <div class="camp-metric"><div class="camp-metric-val">R$10,33</div><div class="camp-metric-lbl">CPA</div></div>
+          <div class="camp-metric"><div class="camp-metric-val text-gold">5.3x</div><div class="camp-metric-lbl">ROAS</div></div>
+        </div>
+        <span class="badge badge-approved">Ativa</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/sidebar.js"></script>
+<script>
+buildClientSidebar('campaigns');
+
+function switchPeriod(btn) {
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  showToast('Período atualizado: ' + btn.textContent, 'gold');
+}
+
+// Investment vs Revenue Chart
+const ctx1 = document.getElementById('investChart').getContext('2d');
+const days = ['1','3','5','7','9','11','13','15','17','19','21','23','25','27','29'];
+new Chart(ctx1, {
+  type: 'bar',
+  data: {
+    labels: days,
+    datasets: [
+      { label: 'Investimento', data: [280,310,265,320,290,340,305,360,290,315,340,280,350,320,370], backgroundColor: 'rgba(212,175,55,0.2)', borderColor: '#D4AF37', borderWidth: 1 },
+      { label: 'Receita', data: [980,1200,920,1380,1050,1560,1200,1620,1100,1350,1500,1050,1600,1400,1650], backgroundColor: 'rgba(34,197,94,0.15)', borderColor: '#22C55E', borderWidth: 1 }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#9A9590', font: { size: 11 } } } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#5A5550', font: { size: 10 } } },
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#5A5550', font: { size: 10 }, callback: v => 'R$'+v } }
+    }
+  }
+});
+
+// Platform Pie
+const ctx2 = document.getElementById('platformChart').getContext('2d');
+new Chart(ctx2, {
+  type: 'doughnut',
+  data: {
+    labels: ['Meta Ads', 'Google Ads'],
+    datasets: [{ data: [63, 37], backgroundColor: ['rgba(24,119,242,0.7)', 'rgba(234,67,53,0.7)'], borderColor: ['#1877F2', '#EA4335'], borderWidth: 2, hoverOffset: 8 }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#9A9590', padding: 16, font: { size: 12 } } }
+    },
+    cutout: '70%'
+  }
+});
+</script>
+</body>
+</html>

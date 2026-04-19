@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24K Company — Agente IA</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .agent-layout { display:grid; grid-template-columns:340px 1fr; gap:24px; height:calc(100vh - var(--header-height) - 64px); }
+  .agent-sidebar { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; overflow-y:auto; }
+  .agent-main { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); display:flex; flex-direction:column; overflow:hidden; }
+  .chat-area { flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:16px; }
+  .chat-input-area { padding:16px 24px; border-top:1px solid var(--border); background:var(--bg-secondary); }
+  .chat-input-row { display:flex; gap:10px; }
+
+  .ai-msg { display:flex; gap:12px; max-width:90%; }
+  .ai-msg-avatar { width:36px; height:36px; background:linear-gradient(135deg,var(--gold-dark),var(--gold)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#000; flex-shrink:0; }
+  .ai-msg-content { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius) var(--radius) var(--radius) var(--radius-sm); padding:14px 16px; font-size:14px; color:var(--text-secondary); line-height:1.65; }
+  .user-msg { display:flex; justify-content:flex-end; }
+  .user-msg-content { background:var(--gold-muted); border:1px solid var(--gold-border); border-radius:var(--radius) var(--radius) var(--radius-sm) var(--radius); padding:12px 16px; font-size:14px; color:var(--text-primary); max-width:75%; }
+
+  .agent-option-btn { display:block; width:100%; text-align:left; padding:12px 14px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px; color:var(--text-secondary); cursor:pointer; transition:all 0.2s; margin-bottom:8px; font-family:'DM Sans',sans-serif; }
+  .agent-option-btn:hover { border-color:var(--gold-border); color:var(--gold); }
+
+  .context-label { font-size:11px; text-transform:uppercase; letter-spacing:2px; color:var(--text-muted); margin:16px 0 8px; }
+
+  .client-chip { display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:6px; cursor:pointer; transition:all 0.2s; }
+  .client-chip:hover { border-color:var(--gold-border); }
+  .client-chip.selected { border-color:var(--gold); background:var(--gold-muted); }
+  .client-chip .chip-av { width:28px; height:28px; border-radius:50%; background:var(--bg-card); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; }
+  .client-chip .chip-name { font-size:13px; color:var(--text-primary); }
+  .client-chip .chip-meta { font-size:11px; color:var(--text-muted); }
+
+  .typing-dots { display:flex; gap:4px; align-items:center; padding:4px 0; }
+  .typing-dot { width:8px; height:8px; background:var(--gold); border-radius:50%; animation:typingDot 1.4s infinite; }
+  .typing-dot:nth-child(2) { animation-delay:0.2s; }
+  .typing-dot:nth-child(3) { animation-delay:0.4s; }
+  @keyframes typingDot { 0%,80%,100%{transform:scale(0.8);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+
+  .result-block { background:var(--bg-card); border:1px solid var(--border-gold); border-radius:var(--radius); padding:16px; margin-top:12px; }
+  .result-block h4 { font-size:13px; font-weight:600; color:var(--gold); margin-bottom:10px; }
+  .result-block ul { list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .result-block li { font-size:13px; color:var(--text-secondary); padding-left:16px; position:relative; }
+  .result-block li::before { content:'▸'; position:absolute; left:0; color:var(--gold); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Agente de Campanhas — IA</div>
+        <div class="topbar-subtitle">Crie, otimize e analise campanhas com inteligência artificial</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-outline btn-sm" onclick="clearChat()">🗑 Nova Conversa</button>
+        <span class="badge badge-gold">Beta</span>
+      </div>
+    </div>
+
+    <div class="page-content" style="height:calc(100vh - 64px);display:flex;flex-direction:column">
+      <div class="agent-layout" style="flex:1">
+        <!-- Left Sidebar -->
+        <div class="agent-sidebar">
+          <div class="context-label">Cliente Ativo</div>
+          <div class="client-chip selected" onclick="selectClient(this,'Rafael Mendes','E-commerce')">
+            <div class="chip-av">RM</div>
+            <div><div class="chip-name">Rafael Mendes</div><div class="chip-meta">E-commerce · R$8.240/mês</div></div>
+          </div>
+          <div class="client-chip" onclick="selectClient(this,'Juliana Costa','Infoproduto')">
+            <div class="chip-av" style="color:var(--info)">JC</div>
+            <div><div class="chip-name">Juliana Costa</div><div class="chip-meta">Infoproduto · R$5.000/mês</div></div>
+          </div>
+          <div class="client-chip" onclick="selectClient(this,'Marina Lima','Serviços')">
+            <div class="chip-av" style="color:var(--success)">ML</div>
+            <div><div class="chip-name">Marina Lima</div><div class="chip-meta">Serviços · R$3.500/mês</div></div>
+          </div>
+          <div class="client-chip" onclick="selectClient(this,'Pedro Silva','Local')">
+            <div class="chip-av" style="color:var(--error)">PS</div>
+            <div><div class="chip-name">Pedro Silva</div><div class="chip-meta">Negócio Local · R$2.000/mês</div></div>
+          </div>
+
+          <div class="context-label">Ações Rápidas</div>
+          <button class="agent-option-btn" onclick="quickAction('Crie uma estrutura completa de campanha de Leads para o cliente selecionado, incluindo objetivos, segmentação de público, criativos sugeridos e orçamento.')">🎯 Criar campanha de Leads</button>
+          <button class="agent-option-btn" onclick="quickAction('Analise as métricas atuais do cliente e sugira 3 otimizações específicas para aumentar o ROAS.')">📈 Otimizar ROAS</button>
+          <button class="agent-option-btn" onclick="quickAction('Escreva 3 variações de copy para anúncio de feed no Meta Ads para o cliente, com headline, corpo do texto e CTA.')">✍️ Gerar copies de anúncio</button>
+          <button class="agent-option-btn" onclick="quickAction('Monte uma estratégia de retargeting completa: segmentação, criativos, duração e orçamento recomendado.')">🔁 Estratégia de Retargeting</button>
+          <button class="agent-option-btn" onclick="quickAction('Analise os dados de campanha e crie um relatório executivo para apresentar ao cliente com os principais resultados e próximos passos.')">📄 Relatório para cliente</button>
+          <button class="agent-option-btn" onclick="quickAction('Sugira 5 ângulos de anúncio diferentes para o produto principal do cliente, cada um explorando uma dor ou desejo diferente do público-alvo.')">💡 Ângulos de anúncio</button>
+
+          <div class="context-label">Histórico</div>
+          <div class="text-xs text-muted">Campanha Leads · Rafael · Há 2h</div>
+          <div class="text-xs text-muted" style="margin-top:6px">Copies Meta · Juliana · Ontem</div>
+          <div class="text-xs text-muted" style="margin-top:6px">Relatório março · Marina · 3 dias</div>
+        </div>
+
+        <!-- Main Chat -->
+        <div class="agent-main">
+          <div class="chat-area" id="chat-area">
+            <!-- Initial message -->
+            <div class="ai-msg">
+              <div class="ai-msg-avatar">IA</div>
+              <div class="ai-msg-content">
+                Olá! Sou o <strong>Agente de Campanhas da 24K Company</strong>. Tenho acesso ao histórico e perfil de todos os clientes.<br><br>
+                Posso te ajudar a:<br>
+                ▸ Criar estruturas completas de campanha<br>
+                ▸ Gerar copies de anúncio<br>
+                ▸ Analisar métricas e sugerir otimizações<br>
+                ▸ Montar estratégias de retargeting<br>
+                ▸ Preparar relatórios para clientes<br><br>
+                O cliente <strong>Rafael Mendes</strong> está selecionado. Como posso ajudar?
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-area">
+            <div class="chat-input-row">
+              <input type="text" class="form-control" id="chat-input" placeholder="Digite sua pergunta ou instrução para o Agente IA..." onkeydown="if(event.key==='Enter')sendMessage()">
+              <button class="btn btn-primary" onclick="sendMessage()" style="min-width:80px">Enviar</button>
+            </div>
+            <div class="text-xs text-muted mt-8">O Agente IA opera em modo sugestivo. Todas as ações devem ser revisadas pela equipe antes de implementar.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/sidebar.js"></script>
+<script>
+const role = localStorage.getItem('24k_role') || 'team';
+if (role === 'executive') buildExecutiveSidebar('agent');
+else buildTeamSidebar('agent');
+
+let selectedClient = 'Rafael Mendes';
+let selectedClientType = 'E-commerce';
+
+function selectClient(chip, name, type) {
+  document.querySelectorAll('.client-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  selectedClient = name;
+  selectedClientType = type;
+  addUserMessage(`Mudei o contexto para o cliente: ${name}`);
+  setTimeout(() => {
+    addAIMessage(`Contexto atualizado! Agora estou analisando o perfil de <strong>${name}</strong> (${type}). Tenho acesso ao histórico de campanhas, dados de performance e perfil de negócio. O que você gostaria de fazer?`);
+  }, 600);
+}
+
+function quickAction(prompt) {
+  addUserMessage(prompt.substring(0, 80) + '...');
+  showTyping();
+  setTimeout(() => {
+    removeTyping();
+    generateAIResponse(prompt);
+  }, 2000);
+}
+
+function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addUserMessage(text);
+  showTyping();
+  setTimeout(() => {
+    removeTyping();
+    generateAIResponse(text);
+  }, 1500 + Math.random() * 1000);
+}
+
+function addUserMessage(text) {
+  const area = document.getElementById('chat-area');
+  const el = document.createElement('div');
+  el.className = 'user-msg';
+  el.innerHTML = `<div class="user-msg-content">${text}</div>`;
+  area.appendChild(el);
+  area.scrollTop = area.scrollHeight;
+}
+
+function addAIMessage(html) {
+  const area = document.getElementById('chat-area');
+  const el = document.createElement('div');
+  el.className = 'ai-msg';
+  el.innerHTML = `<div class="ai-msg-avatar">IA</div><div class="ai-msg-content">${html}</div>`;
+  area.appendChild(el);
+  area.scrollTop = area.scrollHeight;
+}
+
+function showTyping() {
+  const area = document.getElementById('chat-area');
+  const el = document.createElement('div');
+  el.className = 'ai-msg';
+  el.id = 'typing-indicator';
+  el.innerHTML = `<div class="ai-msg-avatar">IA</div><div class="ai-msg-content"><div class="typing-dots"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+  area.appendChild(el);
+  area.scrollTop = area.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+function generateAIResponse(prompt) {
+  const lp = prompt.toLowerCase();
+  let response = '';
+
+  if (lp.includes('leads') || lp.includes('campanha')) {
+    response = `Ótimo! Aqui está a estrutura de campanha de <strong>Geração de Leads</strong> para <strong>${selectedClient}</strong>:
+
+<div class="result-block">
+  <h4>🎯 Objetivo & Configuração</h4>
+  <ul>
+    <li>Objetivo: Geração de Leads (formulário instantâneo Meta)</li>
+    <li>Orçamento diário: R$150 (Conjunto 1) + R$100 (Conjunto 2)</li>
+    <li>Duração inicial: 14 dias de aprendizado</li>
+    <li>Pixel: Configurado com evento Lead</li>
+  </ul>
+</div>
+
+<div class="result-block">
+  <h4>👥 Segmentação de Público</h4>
+  <ul>
+    <li>Conjunto 1 — Público Frio (Interesses): Empreendedorismo, Marketing Digital, Finanças, Idade 25-45</li>
+    <li>Conjunto 2 — Lookalike 1%: Baseado em clientes que compraram nos últimos 90 dias</li>
+    <li>Exclusão: Quem já comprou (Custom Audience dos compradores)</li>
+  </ul>
+</div>
+
+<div class="result-block">
+  <h4>🎨 Criativos Sugeridos</h4>
+  <ul>
+    <li>Criativo A: Vídeo de depoimento + estatísticas de resultado (15s)</li>
+    <li>Criativo B: Imagem com headline provocativa + social proof</li>
+    <li>Criativo C: Carrossel educativo com pain points do público</li>
+  </ul>
+</div>
+
+Deseja que eu escreva os copies para cada criativo?`;
+  } else if (lp.includes('copy') || lp.includes('copi') || lp.includes('texto')) {
+    response = `Aqui estão <strong>3 copies de alto impacto</strong> para <strong>${selectedClient}</strong>:
+
+<div class="result-block">
+  <h4>✍️ Copy 1 — Dor/Problema (Público Frio)</h4>
+  <ul>
+    <li><strong>Headline:</strong> "Você já gastou R$5.000 em anúncios e vendeu menos do que esperava?"</li>
+    <li><strong>Corpo:</strong> O problema não é o produto — é a estratégia. Enquanto 73% dos negócios desperdiçam budget sem retorno, nossos clientes têm ROAS médio de 4.2x. Veja como.</li>
+    <li><strong>CTA:</strong> Quero minha estratégia gratuita →</li>
+  </ul>
+</div>
+
+<div class="result-block">
+  <h4>✍️ Copy 2 — Prova Social (Público Morno)</h4>
+  <ul>
+    <li><strong>Headline:</strong> "De R$2.000 a R$34.000 em vendas — em 30 dias com tráfego pago"</li>
+    <li><strong>Corpo:</strong> É o que a 24K Company fez pelo Rafael. Sem promessa vazia: dados reais, estratégia real, resultado real. Próximo case pode ser o seu.</li>
+    <li><strong>CTA:</strong> Ver como foi feito →</li>
+  </ul>
+</div>
+
+<div class="result-block">
+  <h4>✍️ Copy 3 — Urgência/Escassez (Retargeting)</h4>
+  <ul>
+    <li><strong>Headline:</strong> "Você visitou nossa página. Tomou alguma ação?"</li>
+    <li><strong>Corpo:</strong> Cada dia sem uma estratégia de tráfego é dinheiro que seu concorrente está faturando. A consulta gratuita encerra sexta.</li>
+    <li><strong>CTA:</strong> Garantir minha vaga →</li>
+  </ul>
+</div>
+
+Quer ajustes no tom ou algum copy específico para um formato diferente?`;
+  } else if (lp.includes('roas') || lp.includes('otimiz')) {
+    response = `Analisando as métricas de <strong>${selectedClient}</strong>... Aqui estão <strong>3 otimizações prioritárias</strong>:
+
+<div class="result-block">
+  <h4>⚡ Otimização 1 — Alta Prioridade</h4>
+  <ul>
+    <li>Problema: Criativo B com frequência 4.2 no público frio → fadiga</li>
+    <li>Ação: Pausar Criativo B e ativar Criativo C (carrossel educativo)</li>
+    <li>Impacto esperado: ↑ CTR em ~18%, ↓ CPL em ~12%</li>
+    <li>Prazo: Implementar hoje</li>
+  </ul>
+</div>
+
+<div class="result-block">
+  <h4>⚡ Otimização 2 — Média Prioridade</h4>
+  <ul>
+    <li>Problema: Budget concentrado no horário errado</li>
+    <li>Ação: Programar 70% do budget para Qui-Sáb, 18h-21h</li>
+    <li>Impacto esperado: ↑ Conversões em ~15% sem aumentar budget</li>
+    <li>Prazo: Implementar esta semana</li>
+  </ul>
+</div>
+
+<div class="result-block">
+  <h4>⚡ Otimização 3 — Oportunidade</h4>
+  <ul>
+    <li>Google Search tem ROAS 6.1x → subaproveitado</li>
+    <li>Ação: Aumentar CPC alvo de R$2,50 para R$3,80 nas palavras top</li>
+    <li>Impacto esperado: +40% no volume de cliques qualificados</li>
+    <li>Prazo: Implementar em até 5 dias</li>
+  </ul>
+</div>`;
+  } else {
+    response = `Entendido! Com base no perfil de <strong>${selectedClient}</strong> (${selectedClientType}), aqui está minha análise:<br><br>
+    Posso aprofundar qualquer aspecto da estratégia de tráfego, gerar copies específicos, criar relatórios ou montar uma campanha do zero. Use as ações rápidas à esquerda para as tarefas mais comuns, ou continue me descrevendo o que precisa.`;
+  }
+
+  addAIMessage(response);
+}
+
+function clearChat() {
+  const area = document.getElementById('chat-area');
+  area.innerHTML = '';
+  addAIMessage('Nova conversa iniciada. Selecione um cliente e me diga como posso ajudar!');
+}
+</script>
+</body>
+</html>

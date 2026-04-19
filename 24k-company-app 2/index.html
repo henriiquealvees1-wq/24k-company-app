@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24K Company — Acesso</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-body">
+
+<div class="auth-split">
+  <!-- LEFT PANEL -->
+  <div class="auth-panel-left">
+    <div class="auth-brand">
+      <div class="brand-logo">24K</div>
+      <div class="brand-name">COMPANY</div>
+    </div>
+    <div class="auth-tagline">
+      <h1>Tráfego Pago com<br><span class="text-gold">Resultados Reais.</span></h1>
+      <p>A plataforma operacional da 24K Company. Transparência total, inteligência artificial e comunicação fluida entre você e sua equipe.</p>
+    </div>
+    <div class="auth-features">
+      <div class="feat-item">
+        <div class="feat-icon">◆</div>
+        <div>
+          <div class="feat-title">Onboarding Inteligente</div>
+          <div class="feat-desc">IA identifica sua persona e personaliza toda a estratégia</div>
+        </div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">◆</div>
+        <div>
+          <div class="feat-title">Aprovação em Tempo Real</div>
+          <div class="feat-desc">Copies, imagens e vídeos disponíveis para sua análise</div>
+        </div>
+      </div>
+      <div class="feat-item">
+        <div class="feat-icon">◆</div>
+        <div>
+          <div class="feat-title">Métricas ao Vivo</div>
+          <div class="feat-desc">Dashboard atualizado com dados do Meta Ads e Google Ads</div>
+        </div>
+      </div>
+    </div>
+    <div class="auth-bg-pattern"></div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="auth-panel-right">
+    <div class="auth-card">
+      <!-- TABS -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">Entrar</button>
+        <button class="auth-tab" onclick="switchTab('register')">Criar Conta</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="tab-login" class="auth-form">
+        <h2 class="auth-form-title">Bem-vindo de volta</h2>
+        <p class="auth-form-sub">Acesse sua conta da 24K Company</p>
+
+        <div class="form-group mt-24">
+          <label class="form-label">E-mail</label>
+          <input type="email" class="form-control" placeholder="seu@email.com" id="login-email">
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="display:flex;justify-content:space-between;">
+            Senha
+            <a href="#" class="text-gold text-sm" style="font-weight:400">Esqueci a senha</a>
+          </label>
+          <input type="password" class="form-control" placeholder="••••••••" id="login-pass">
+        </div>
+
+        <!-- Quick Access Demos -->
+        <div class="demo-access">
+          <div class="demo-label">Acesso Rápido (Demo)</div>
+          <div class="demo-btns">
+            <button class="demo-btn" onclick="loginAs('client')">👤 Cliente</button>
+            <button class="demo-btn" onclick="loginAs('team')">👥 Colaborador</button>
+            <button class="demo-btn" onclick="loginAs('executive')">💼 Gestor</button>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg w-full mt-16" onclick="doLogin()">
+          Acessar Plataforma
+        </button>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="tab-register" class="auth-form hidden">
+        <h2 class="auth-form-title">Criar sua conta</h2>
+        <p class="auth-form-sub">Insira o código de convite enviado pela 24K Company</p>
+
+        <div class="form-group mt-24">
+          <label class="form-label">Código de Convite</label>
+          <input type="text" class="form-control" placeholder="24K-XXXXX" id="reg-invite">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Tipo de Acesso</label>
+          <div class="role-selector">
+            <button class="role-btn active" onclick="selectRole(this,'client')" data-role="client">
+              <div class="role-icon">👤</div>
+              <div class="role-name">Cliente</div>
+              <div class="role-desc">Acesso ao meu painel e materiais</div>
+            </button>
+            <button class="role-btn" onclick="selectRole(this,'team')" data-role="team">
+              <div class="role-icon">👥</div>
+              <div class="role-name">Colaborador</div>
+              <div class="role-desc">Painel operacional da equipe</div>
+            </button>
+            <button class="role-btn" onclick="selectRole(this,'executive')" data-role="executive">
+              <div class="role-icon">💼</div>
+              <div class="role-name">Gestor</div>
+              <div class="role-desc">Acesso executivo completo</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Nome</label>
+            <input type="text" class="form-control" placeholder="João" id="reg-name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sobrenome</label>
+            <input type="text" class="form-control" placeholder="Silva" id="reg-last">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input type="email" class="form-control" placeholder="seu@email.com" id="reg-email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input type="password" class="form-control" placeholder="Mínimo 8 caracteres" id="reg-pass">
+        </div>
+
+        <button class="btn btn-primary btn-lg w-full mt-8" onclick="doRegister()">
+          Criar Conta
+        </button>
+      </div>
+    </div>
+
+    <div class="auth-footer">
+      <span class="text-muted text-xs">© 2025 24K Company. Todos os direitos reservados.</span>
+      <span class="text-muted text-xs">Seus dados são protegidos com criptografia AES-256</span>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast-container"></div>
+
+<script>
+let selectedRole = 'client';
+
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.add('hidden'));
+  event.target.classList.add('active');
+  document.getElementById('tab-' + tab).classList.remove('hidden');
+}
+
+function selectRole(btn, role) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedRole = role;
+}
+
+function loginAs(role) {
+  const creds = {
+    client: { email: 'cliente@demo.com', pass: '***', label: 'Cliente' },
+    team: { email: 'equipe@24k.com', pass: '***', label: 'Colaborador' },
+    executive: { email: 'gestor@24k.com', pass: '***', label: 'Gestor' }
+  };
+  document.getElementById('login-email').value = creds[role].email;
+  document.getElementById('login-pass').value = creds[role].pass;
+  selectedRole = role;
+  showToast('Logando como ' + creds[role].label + '...', 'gold');
+  setTimeout(() => redirectByRole(role), 800);
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value;
+  if (!email) { showToast('Informe o e-mail', 'error'); return; }
+  showToast('Autenticando...', 'gold');
+  setTimeout(() => redirectByRole(selectedRole), 1000);
+}
+
+function doRegister() {
+  const invite = document.getElementById('reg-invite').value;
+  if (!invite) { showToast('Informe o código de convite', 'error'); return; }
+  const name = document.getElementById('reg-name').value;
+  if (!name) { showToast('Informe o nome', 'error'); return; }
+  showToast('Conta criada! Redirecionando...', 'success');
+  setTimeout(() => redirectByRole(selectedRole), 1200);
+}
+
+function redirectByRole(role) {
+  localStorage.setItem('24k_role', role);
+  localStorage.setItem('24k_user', JSON.stringify({
+    name: document.getElementById('reg-name')?.value || (role === 'client' ? 'Rafael Mendes' : role === 'team' ? 'Ana Souza' : 'Luis Henrique'),
+    role: role,
+    initials: role === 'client' ? 'RM' : role === 'team' ? 'AS' : 'LH'
+  }));
+
+  if (role === 'client') {
+    const hasOnboarded = localStorage.getItem('24k_onboarded');
+    window.location.href = hasOnboarded ? 'client-dashboard.html' : 'onboarding.html';
+  } else if (role === 'team') {
+    window.location.href = 'team-dashboard.html';
+  } else {
+    window.location.href = 'executive-dashboard.html';
+  }
+}
+
+function showToast(msg, type = 'gold') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icons = { gold: '✦', success: '✓', error: '✕' };
+  toast.innerHTML = `<span style="color:var(--${type === 'gold' ? 'gold' : type === 'success' ? 'success' : 'error'})">${icons[type]}</span> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24K Company — Feedback</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .nps-card { background:linear-gradient(135deg,var(--bg-card) 0%,rgba(212,175,55,0.05) 100%); border:1px solid var(--border-gold); border-radius:var(--radius-xl); padding:36px; margin-bottom:24px; }
+  .nps-title { font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:600; margin-bottom:8px; }
+  .nps-scale { display:flex; gap:8px; margin:24px 0; flex-wrap:wrap; }
+  .nps-btn { width:52px; height:52px; border:1px solid var(--border); background:var(--bg-secondary); border-radius:var(--radius-sm); font-size:15px; font-weight:600; cursor:pointer; transition:all 0.2s; color:var(--text-secondary); font-family:'DM Sans',sans-serif; }
+  .nps-btn:hover { border-color:var(--gold-border); color:var(--text-primary); }
+  .nps-btn.selected { background:var(--gold); border-color:var(--gold); color:#000; }
+  .nps-btn.range-red { border-color:rgba(239,68,68,0.3); }
+  .nps-btn.range-yellow { border-color:rgba(245,158,11,0.3); }
+  .nps-btn.range-green { border-color:rgba(34,197,94,0.3); }
+
+  .ticket-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:24px; margin-bottom:16px; }
+  .ticket-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .ticket-num { font-size:12px; color:var(--text-muted); font-family:monospace; }
+
+  .chat-thread { max-height:280px; overflow-y:auto; margin-bottom:16px; display:flex; flex-direction:column; gap:10px; }
+  .msg { max-width:80%; padding:12px 14px; border-radius:var(--radius); font-size:14px; line-height:1.5; }
+  .msg.client { background:var(--gold-muted); border:1px solid var(--gold-border); color:var(--text-primary); align-self:flex-end; border-radius:var(--radius) var(--radius) var(--radius-sm) var(--radius); }
+  .msg.team { background:var(--bg-secondary); border:1px solid var(--border); color:var(--text-secondary); align-self:flex-start; border-radius:var(--radius) var(--radius) var(--radius) var(--radius-sm); }
+  .msg-meta { font-size:11px; color:var(--text-muted); margin-top:4px; }
+
+  .send-bar { display:flex; gap:8px; }
+  .send-bar input { flex:1; }
+
+  .help-btn { position:fixed; bottom:24px; right:24px; width:56px; height:56px; background:var(--gold); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:22px; cursor:pointer; box-shadow:0 4px 20px rgba(212,175,55,0.4); border:none; transition:all 0.2s; }
+  .help-btn:hover { transform:scale(1.1); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Feedback & Suporte</div>
+        <div class="topbar-subtitle">Fale com a equipe 24K Company</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-primary btn-sm" onclick="openNewTicket()">+ Novo Chamado</button>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="grid-2" style="align-items:start">
+        <div>
+          <!-- NPS -->
+          <div class="nps-card">
+            <div class="nps-title">Como você avalia nosso serviço este mês?</div>
+            <p class="text-secondary text-sm">Sua resposta é fundamental para continuarmos melhorando.</p>
+            <div class="nps-scale" id="nps-scale">
+              <button class="nps-btn range-red" onclick="selectNps(this,0)">0</button>
+              <button class="nps-btn range-red" onclick="selectNps(this,1)">1</button>
+              <button class="nps-btn range-red" onclick="selectNps(this,2)">2</button>
+              <button class="nps-btn range-red" onclick="selectNps(this,3)">3</button>
+              <button class="nps-btn range-red" onclick="selectNps(this,4)">4</button>
+              <button class="nps-btn range-red" onclick="selectNps(this,5)">5</button>
+              <button class="nps-btn range-red" onclick="selectNps(this,6)">6</button>
+              <button class="nps-btn range-yellow" onclick="selectNps(this,7)">7</button>
+              <button class="nps-btn range-yellow" onclick="selectNps(this,8)">8</button>
+              <button class="nps-btn range-green" onclick="selectNps(this,9)">9</button>
+              <button class="nps-btn range-green" onclick="selectNps(this,10)">10</button>
+            </div>
+            <div id="nps-label" class="text-sm text-muted mb-16" style="min-height:20px"></div>
+            <div class="form-group">
+              <label class="form-label">Comentário (opcional)</label>
+              <textarea class="form-control" id="nps-comment" placeholder="O que podemos melhorar? O que está indo bem?" rows="3"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="submitNPS()">Enviar Avaliação</button>
+          </div>
+
+          <!-- Suggestion Box -->
+          <div class="card">
+            <div class="card-title">💡 Caixa de Sugestões</div>
+            <p class="text-secondary text-sm mb-16">Tem uma ideia para melhorarmos o serviço ou a plataforma?</p>
+            <div class="form-group">
+              <label class="form-label">Sua sugestão</label>
+              <textarea class="form-control" placeholder="Ex: Seria ótimo ter um relatório semanal enviado pelo WhatsApp..." rows="4"></textarea>
+            </div>
+            <button class="btn btn-outline w-full" onclick="showToast('Sugestão enviada! Obrigado.', 'success')">Enviar Sugestão</button>
+          </div>
+        </div>
+
+        <div>
+          <!-- Open Ticket -->
+          <div class="section-header mb-16">
+            <div class="section-title">Chamados Abertos</div>
+            <span class="badge badge-pending">2 em aberto</span>
+          </div>
+
+          <!-- Ticket 1 -->
+          <div class="ticket-card">
+            <div class="ticket-header">
+              <div>
+                <div class="font-500" style="font-size:14px">Dúvida sobre CPL das campanhas</div>
+                <div class="ticket-num">#24K-2041 · Aberto há 1 dia</div>
+              </div>
+              <span class="badge badge-active">Aberto</span>
+            </div>
+            <div class="chat-thread" id="thread-1">
+              <div class="msg client">
+                Olá! Notei que o CPL do conjunto 2 subiu de R$4,20 para R$5,80 nos últimos 3 dias. Isso é normal ou precisa de ajuste?
+                <div class="msg-meta">Rafael · Há 1 dia</div>
+              </div>
+              <div class="msg team">
+                Oi Rafael! Identificamos sim — trata-se de uma saturação natural do público no final de semana. Já ajustamos os lances para o modo CPC manual e estamos monitorando. Deve normalizar nas próximas 24h.
+                <div class="msg-meta">Ana Souza · 24K Company · 20h atrás</div>
+              </div>
+              <div class="msg client">
+                Entendi! Obrigado pela agilidade. Vou acompanhar aqui no dashboard.
+                <div class="msg-meta">Rafael · 18h atrás</div>
+              </div>
+            </div>
+            <div class="send-bar">
+              <input type="text" class="form-control" placeholder="Responder..." id="reply-1">
+              <button class="btn btn-primary" onclick="sendReply(1)">Enviar</button>
+            </div>
+          </div>
+
+          <!-- Ticket 2 -->
+          <div class="ticket-card">
+            <div class="ticket-header">
+              <div>
+                <div class="font-500" style="font-size:14px">Solicitar relatório detalhado</div>
+                <div class="ticket-num">#24K-2038 · Aberto há 3 dias</div>
+              </div>
+              <span class="badge badge-active">Aberto</span>
+            </div>
+            <div class="chat-thread">
+              <div class="msg client">
+                Preciso de um relatório completo do mês de março para apresentar para meus sócios. Podem gerar?
+                <div class="msg-meta">Rafael · Há 3 dias</div>
+              </div>
+              <div class="msg team">
+                Claro! Estamos preparando o relatório em PDF executivo. Ficará disponível até amanhã às 12h na seção de Campanhas.
+                <div class="msg-meta">Carlos Lima · 24K Company · 2 dias atrás</div>
+              </div>
+            </div>
+            <div class="send-bar">
+              <input type="text" class="form-control" placeholder="Responder..." id="reply-2">
+              <button class="btn btn-primary" onclick="sendReply(2)">Enviar</button>
+            </div>
+          </div>
+
+          <!-- Closed Ticket -->
+          <div class="ticket-card" style="opacity:0.6">
+            <div class="ticket-header">
+              <div>
+                <div class="font-500" style="font-size:14px">Ajuste de orçamento Meta Ads</div>
+                <div class="ticket-num">#24K-2032 · Resolvido há 5 dias</div>
+              </div>
+              <span class="badge badge-approved">Resolvido</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Help Button -->
+<button class="help-btn" onclick="openNewTicket()" title="Precisar de Ajuda">💬</button>
+
+<div id="toast-container"></div>
+<script src="js/sidebar.js"></script>
+<script>
+buildClientSidebar('feedback');
+let selectedNps = null;
+
+const npsLabels = {
+  0:'Muito insatisfeito', 1:'Muito insatisfeito', 2:'Insatisfeito', 3:'Insatisfeito',
+  4:'Insatisfeito', 5:'Neutro', 6:'Neutro', 7:'Satisfeito', 8:'Satisfeito',
+  9:'Muito satisfeito', 10:'Extremamente satisfeito! 🌟'
+};
+
+function selectNps(btn, val) {
+  document.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedNps = val;
+  document.getElementById('nps-label').textContent = npsLabels[val];
+}
+
+function submitNPS() {
+  if (selectedNps === null) { showToast('Selecione uma nota de 0 a 10', 'error'); return; }
+  showToast(`Avaliação ${selectedNps}/10 enviada! Obrigado pelo feedback.`, 'success');
+  document.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('nps-comment').value = '';
+  selectedNps = null;
+  document.getElementById('nps-label').textContent = '';
+}
+
+function sendReply(threadId) {
+  const input = document.getElementById(`reply-${threadId}`);
+  const text = input.value.trim();
+  if (!text) return;
+  const thread = document.getElementById(`thread-${threadId}`);
+  if (thread) {
+    const msg = document.createElement('div');
+    msg.className = 'msg client';
+    msg.innerHTML = `${text}<div class="msg-meta">Você · Agora</div>`;
+    thread.appendChild(msg);
+    thread.scrollTop = thread.scrollHeight;
+  }
+  input.value = '';
+  showToast('Mensagem enviada para a equipe', 'success');
+}
+
+function openNewTicket() {
+  showToast('💬 Em breve: chat direto com o gestor de conta', 'gold');
+}
+</script>
+</body>
+</html>

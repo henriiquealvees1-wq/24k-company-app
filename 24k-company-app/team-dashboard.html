@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24K Company — Dashboard Operacional</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .client-list-item { display:flex; align-items:center; gap:14px; padding:14px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:8px; cursor:pointer; transition:all 0.2s; }
+  .client-list-item:hover { border-color:var(--gold-border); }
+  .client-avatar { width:40px; height:40px; border-radius:50%; background:var(--bg-secondary); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:var(--text-primary); flex-shrink:0; }
+  .client-info { flex:1; }
+  .client-name { font-size:14px; font-weight:500; color:var(--text-primary); }
+  .client-meta { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .client-metrics { display:flex; gap:16px; }
+  .client-kpi { text-align:center; }
+  .client-kpi-val { font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:600; color:var(--text-primary); }
+  .client-kpi-lbl { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); }
+
+  .task-item { display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:8px; }
+  .task-check { width:20px; height:20px; border:2px solid var(--border); border-radius:4px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.2s; }
+  .task-check:hover { border-color:var(--gold); }
+  .task-check.done { background:var(--success); border-color:var(--success); color:#fff; }
+  .task-info { flex:1; }
+  .task-name { font-size:14px; color:var(--text-primary); }
+  .task-due { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .task-priority { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+
+  .upload-zone { border:2px dashed var(--border); border-radius:var(--radius-lg); padding:40px; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--bg-card); }
+  .upload-zone:hover { border-color:var(--gold-border); background:var(--gold-muted); }
+  .upload-icon { font-size:36px; margin-bottom:12px; opacity:0.5; }
+
+  .approval-pending { background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); border-radius:var(--radius); padding:12px 16px; margin-bottom:8px; display:flex; align-items:center; gap:12px; }
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Dashboard Operacional</div>
+        <div class="topbar-subtitle">Área da equipe — Bem-vinda, Ana!</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-primary btn-sm" onclick="window.location.href='upload-materials.html'">+ Upload Material</button>
+        <button class="btn btn-outline btn-sm" onclick="window.location.href='agent.html'">🤖 Agente IA</button>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- Stats -->
+      <div class="stats-grid mb-24">
+        <div class="metric-card gold">
+          <div class="metric-label">Clientes Ativos</div>
+          <div class="metric-value">14</div>
+          <div class="metric-sub">Sob minha gestão</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Materiais Pendentes</div>
+          <div class="metric-value">7</div>
+          <div class="metric-sub">Aguardando aprovação dos clientes</div>
+        </div>
+        <div class="metric-card green">
+          <div class="metric-label">Taxa de Aprovação</div>
+          <div class="metric-value">87%</div>
+          <div class="metric-sub">Materiais aprovados sem revisão</div>
+        </div>
+        <div class="metric-card blue">
+          <div class="metric-label">Entregas no Prazo</div>
+          <div class="metric-value">96%</div>
+          <div class="metric-sub">Este mês</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="align-items:start">
+        <!-- Left Column -->
+        <div>
+          <!-- Client List -->
+          <div class="section-header mb-16">
+            <div class="section-title">Meus Clientes</div>
+            <span class="badge badge-gold">14 ativos</span>
+          </div>
+
+          <div class="client-list-item">
+            <div class="client-avatar">RM</div>
+            <div class="client-info">
+              <div class="client-name">Rafael Mendes</div>
+              <div class="client-meta">E-commerce · Meta + Google · R$8.240/mês</div>
+            </div>
+            <div class="client-metrics">
+              <div class="client-kpi"><div class="client-kpi-val text-gold">4.2x</div><div class="client-kpi-lbl">ROAS</div></div>
+              <div class="client-kpi"><div class="client-kpi-val text-warning">3</div><div class="client-kpi-lbl">Pendentes</div></div>
+            </div>
+            <span class="badge badge-approved">Ativo</span>
+          </div>
+
+          <div class="client-list-item">
+            <div class="client-avatar" style="background:rgba(59,130,246,0.1);color:var(--info)">JC</div>
+            <div class="client-info">
+              <div class="client-name">Juliana Costa</div>
+              <div class="client-meta">Infoproduto · Meta · R$5.000/mês</div>
+            </div>
+            <div class="client-metrics">
+              <div class="client-kpi"><div class="client-kpi-val text-gold">6.1x</div><div class="client-kpi-lbl">ROAS</div></div>
+              <div class="client-kpi"><div class="client-kpi-val text-success">0</div><div class="client-kpi-lbl">Pendentes</div></div>
+            </div>
+            <span class="badge badge-approved">Ativo</span>
+          </div>
+
+          <div class="client-list-item">
+            <div class="client-avatar" style="background:rgba(239,68,68,0.1);color:var(--error)">PS</div>
+            <div class="client-info">
+              <div class="client-name">Pedro Silva</div>
+              <div class="client-meta">Negócio Local · Meta · R$2.000/mês</div>
+            </div>
+            <div class="client-metrics">
+              <div class="client-kpi"><div class="client-kpi-val text-gold">2.8x</div><div class="client-kpi-lbl">ROAS</div></div>
+              <div class="client-kpi"><div class="client-kpi-val text-warning">2</div><div class="client-kpi-lbl">Pendentes</div></div>
+            </div>
+            <span class="badge badge-pending">Atenção</span>
+          </div>
+
+          <div class="client-list-item">
+            <div class="client-avatar" style="background:rgba(34,197,94,0.1);color:var(--success)">ML</div>
+            <div class="client-info">
+              <div class="client-name">Marina Lima</div>
+              <div class="client-meta">Serviços · Google · R$3.500/mês</div>
+            </div>
+            <div class="client-metrics">
+              <div class="client-kpi"><div class="client-kpi-val text-gold">5.3x</div><div class="client-kpi-lbl">ROAS</div></div>
+              <div class="client-kpi"><div class="client-kpi-val text-warning">2</div><div class="client-kpi-lbl">Pendentes</div></div>
+            </div>
+            <span class="badge badge-approved">Ativo</span>
+          </div>
+
+          <!-- Approvals Status -->
+          <div class="section-header mt-24 mb-16">
+            <div class="section-title">Aguardando Aprovação</div>
+            <span class="badge badge-pending">7 itens</span>
+          </div>
+
+          <div class="approval-pending">
+            <span style="font-size:18px">📝</span>
+            <div style="flex:1">
+              <div class="text-sm font-500">Copy - Rafael Mendes</div>
+              <div class="text-xs text-muted">Enviado há 2h · Sem resposta</div>
+            </div>
+            <div class="progress-bar" style="width:60px;height:3px"><div class="progress-fill" style="width:0%"></div></div>
+          </div>
+
+          <div class="approval-pending">
+            <span style="font-size:18px">🎬</span>
+            <div style="flex:1">
+              <div class="text-sm font-500">Vídeo Stories - Rafael Mendes</div>
+              <div class="text-xs text-muted">Enviado ontem · Lembrete enviado</div>
+            </div>
+          </div>
+
+          <div class="approval-pending">
+            <span style="font-size:18px">🖼️</span>
+            <div style="flex:1">
+              <div class="text-sm font-500">Pack Imagens - Pedro Silva</div>
+              <div class="text-xs text-muted">Enviado há 3 dias · Urgente</div>
+            </div>
+            <span class="badge badge-revision">Urgente</span>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div>
+          <!-- Task List -->
+          <div class="section-header mb-16">
+            <div class="section-title">Minhas Tarefas</div>
+            <span class="text-xs text-muted">Hoje, 17 Abr</span>
+          </div>
+
+          <div class="task-item">
+            <div class="task-check" onclick="toggleTask(this)"><span>✓</span></div>
+            <div class="task-info">
+              <div class="task-name">Criar copy de anúncio para Rafael Mendes</div>
+              <div class="task-due">Vence hoje · 🔴 Alta prioridade</div>
+            </div>
+            <div class="task-priority" style="background:var(--error)"></div>
+          </div>
+
+          <div class="task-item">
+            <div class="task-check" onclick="toggleTask(this)"></div>
+            <div class="task-info">
+              <div class="task-name">Otimizar lances da campanha Pedro Silva</div>
+              <div class="task-due">Vence amanhã · 🟡 Média prioridade</div>
+            </div>
+            <div class="task-priority" style="background:var(--warning)"></div>
+          </div>
+
+          <div class="task-item">
+            <div class="task-check done" onclick="toggleTask(this)">✓</div>
+            <div class="task-info">
+              <div class="task-name" style="text-decoration:line-through;opacity:0.5">Subir artes do carrossel para Juliana Costa</div>
+              <div class="task-due">Concluída · 10h30</div>
+            </div>
+            <div class="task-priority" style="background:var(--success)"></div>
+          </div>
+
+          <div class="task-item">
+            <div class="task-check" onclick="toggleTask(this)"></div>
+            <div class="task-info">
+              <div class="task-name">Gerar relatório mensal — Marina Lima</div>
+              <div class="task-due">Vence em 2 dias · 🟢 Normal</div>
+            </div>
+            <div class="task-priority" style="background:var(--success)"></div>
+          </div>
+
+          <div class="task-item">
+            <div class="task-check" onclick="toggleTask(this)"></div>
+            <div class="task-info">
+              <div class="task-name">Configurar público lookalike novo para Rafael</div>
+              <div class="task-due">Vence em 3 dias · Sugestão da IA</div>
+            </div>
+            <div class="task-priority" style="background:var(--gold)"></div>
+          </div>
+
+          <!-- Upload Zone -->
+          <div class="section-header mt-24 mb-12">
+            <div class="section-title">Upload Rápido</div>
+          </div>
+
+          <div class="upload-zone" onclick="window.location.href='upload-materials.html'">
+            <div class="upload-icon">📂</div>
+            <div class="font-500" style="color:var(--text-primary);margin-bottom:6px">Arraste ou clique para enviar material</div>
+            <div class="text-sm text-muted">PNG, JPG, MP4, PDF — Máx. 500MB</div>
+          </div>
+
+          <!-- AI Quick Access -->
+          <div class="card mt-16" style="cursor:pointer;background:linear-gradient(135deg,var(--bg-card),rgba(212,175,55,0.05))" onclick="window.location.href='agent.html'">
+            <div class="flex items-center gap-12 mb-16">
+              <div style="width:40px;height:40px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;color:#000;font-weight:700">IA</div>
+              <div>
+                <div class="font-500" style="font-size:15px">Agente de Campanhas</div>
+                <div class="text-xs text-muted">Criar estrutura de campanha com IA</div>
+              </div>
+              <div class="badge badge-gold" style="margin-left:auto">Beta</div>
+            </div>
+            <div class="text-sm text-secondary">A IA analisa o perfil do cliente e monta toda a estrutura da campanha passo a passo. Selecione o cliente e o objetivo.</div>
+            <button class="btn btn-primary btn-sm mt-16 w-full">Abrir Agente IA →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/sidebar.js"></script>
+<script>
+buildTeamSidebar('dashboard');
+
+function toggleTask(el) {
+  el.classList.toggle('done');
+  if (el.classList.contains('done')) {
+    el.textContent = '✓';
+    el.style.background = 'var(--success)';
+    el.style.borderColor = 'var(--success)';
+    el.style.color = '#fff';
+    showToast('Tarefa concluída ✓', 'success');
+  } else {
+    el.textContent = '';
+    el.style.background = '';
+    el.style.borderColor = '';
+    el.style.color = '';
+  }
+}
+</script>
+</body>
+</html>

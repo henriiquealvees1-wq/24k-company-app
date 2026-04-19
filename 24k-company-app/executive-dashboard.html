@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24K Company — Painel Executivo</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .exec-kpi { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px 24px; }
+  .exec-kpi-icon { font-size:24px; margin-bottom:10px; }
+  .exec-kpi-val { font-family:'Cormorant Garamond',serif; font-size:34px; font-weight:600; color:var(--text-primary); line-height:1; }
+  .exec-kpi-lbl { font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-muted); margin-top:6px; }
+  .exec-kpi-trend { font-size:12px; margin-top:8px; }
+
+  .three-col { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:24px; }
+
+  .alert-item { display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:8px; }
+  .alert-icon { width:36px; height:36px; border-radius:var(--radius-sm); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+
+  .team-member { display:flex; align-items:center; gap:14px; padding:14px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:8px; }
+  .member-perf { margin-left:auto; display:flex; align-items:center; gap:12px; }
+  .perf-score { text-align:center; }
+  .perf-val { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--text-primary); }
+  .perf-lbl { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); }
+
+  .portfolio-table { width:100%; border-collapse:collapse; }
+  .portfolio-table th { padding:12px 16px; text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); border-bottom:1px solid var(--border); font-weight:600; }
+  .portfolio-table td { padding:14px 16px; font-size:14px; color:var(--text-secondary); border-bottom:1px solid var(--border); }
+  .portfolio-table tr:last-child td { border-bottom:none; }
+  .portfolio-table tr:hover td { background:var(--bg-card-hover); }
+
+  .roas-indicator { display:inline-flex; align-items:center; gap:6px; font-weight:600; font-family:'Cormorant Garamond',serif; font-size:16px; }
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Painel Executivo</div>
+        <div class="topbar-subtitle">Visão geral da 24K Company — Abril 2025</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-outline btn-sm">📊 Exportar Relatório</button>
+        <button class="btn btn-primary btn-sm" onclick="window.location.href='agent.html'">🤖 Agente IA</button>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- KPI Grid -->
+      <div class="stats-grid mb-24">
+        <div class="exec-kpi">
+          <div class="exec-kpi-icon">👥</div>
+          <div class="exec-kpi-val">14</div>
+          <div class="exec-kpi-lbl">Clientes Ativos</div>
+          <div class="exec-kpi-trend text-success">↑ +2 este mês</div>
+        </div>
+        <div class="exec-kpi">
+          <div class="exec-kpi-icon">💰</div>
+          <div class="exec-kpi-val">R$87.400</div>
+          <div class="exec-kpi-lbl">Investimento Gerenciado</div>
+          <div class="exec-kpi-trend text-success">↑ 18% vs mês anterior</div>
+        </div>
+        <div class="exec-kpi">
+          <div class="exec-kpi-icon">💵</div>
+          <div class="exec-kpi-val">R$38.600</div>
+          <div class="exec-kpi-lbl">MRR da Agência</div>
+          <div class="exec-kpi-trend text-success">↑ 12% vs mês anterior</div>
+        </div>
+        <div class="exec-kpi">
+          <div class="exec-kpi-icon">📈</div>
+          <div class="exec-kpi-val">4.6x</div>
+          <div class="exec-kpi-lbl">ROAS Médio da Carteira</div>
+          <div class="exec-kpi-trend text-success">↑ 0.4 pontos</div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="three-col">
+        <div class="chart-card" style="grid-column:span 2">
+          <div class="chart-header">
+            <div class="chart-title">MRR da Agência — Últimos 6 meses</div>
+          </div>
+          <canvas id="mrrChart" height="160"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Distribuição de Clientes</div>
+          </div>
+          <canvas id="clientPieChart" height="180"></canvas>
+        </div>
+      </div>
+
+      <div class="grid-2" style="align-items:start;margin-top:24px">
+        <!-- Left -->
+        <div>
+          <!-- Alerts -->
+          <div class="section-header mb-16">
+            <div class="section-title">Alertas & Oportunidades</div>
+            <span class="badge badge-revision">3 atenção</span>
+          </div>
+
+          <div class="alert-item">
+            <div class="alert-icon" style="background:rgba(239,68,68,0.1)">🔴</div>
+            <div style="flex:1">
+              <div class="font-500 text-sm">Risco de Churn — Pedro Silva</div>
+              <div class="text-xs text-muted">ROAS 2.8x · 3 dias sem abrir o app · Ticket sem resposta há 48h</div>
+            </div>
+            <button class="btn btn-danger btn-sm">Agir</button>
+          </div>
+
+          <div class="alert-item">
+            <div class="alert-icon" style="background:rgba(245,158,11,0.1)">⚠️</div>
+            <div style="flex:1">
+              <div class="font-500 text-sm">Orçamento Esgotando — Rafael Mendes</div>
+              <div class="text-xs text-muted">70% do budget mensal utilizado em 17/30 dias</div>
+            </div>
+            <button class="btn btn-outline btn-sm">Ver</button>
+          </div>
+
+          <div class="alert-item">
+            <div class="alert-icon" style="background:rgba(212,175,55,0.1)">✦</div>
+            <div style="flex:1">
+              <div class="font-500 text-sm">Oportunidade de Upsell — Juliana Costa</div>
+              <div class="text-xs text-muted">ROAS 6.1x · Solicitou reunião de alinhamento</div>
+            </div>
+            <button class="btn btn-primary btn-sm">Contatar</button>
+          </div>
+
+          <!-- Team Performance -->
+          <div class="section-header mt-24 mb-16">
+            <div class="section-title">Performance da Equipe</div>
+          </div>
+
+          <div class="team-member">
+            <div class="user-avatar">AS</div>
+            <div class="user-info">
+              <div class="user-name">Ana Souza</div>
+              <div class="user-role text-xs">6 clientes · Gestora de Tráfego</div>
+            </div>
+            <div class="member-perf">
+              <div class="perf-score"><div class="perf-val text-success">96%</div><div class="perf-lbl">Entrega</div></div>
+              <div class="perf-score"><div class="perf-val text-gold">89%</div><div class="perf-lbl">Aprovação</div></div>
+              <span class="badge badge-approved">Excelente</span>
+            </div>
+          </div>
+
+          <div class="team-member">
+            <div class="user-avatar" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:var(--info)">CL</div>
+            <div class="user-info">
+              <div class="user-name">Carlos Lima</div>
+              <div class="user-role text-xs">5 clientes · Designer de Criativos</div>
+            </div>
+            <div class="member-perf">
+              <div class="perf-score"><div class="perf-val text-success">92%</div><div class="perf-lbl">Entrega</div></div>
+              <div class="perf-score"><div class="perf-val text-gold">84%</div><div class="perf-lbl">Aprovação</div></div>
+              <span class="badge badge-active">Bom</span>
+            </div>
+          </div>
+
+          <div class="team-member">
+            <div class="user-avatar" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--warning)">MF</div>
+            <div class="user-info">
+              <div class="user-name">Marcos Freitas</div>
+              <div class="user-role text-xs">3 clientes · Copywriter</div>
+            </div>
+            <div class="member-perf">
+              <div class="perf-score"><div class="perf-val text-warning">78%</div><div class="perf-lbl">Entrega</div></div>
+              <div class="perf-score"><div class="perf-val text-warning">71%</div><div class="perf-lbl">Aprovação</div></div>
+              <span class="badge badge-pending">Atenção</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right — Portfolio Table -->
+        <div>
+          <div class="section-header mb-16">
+            <div class="section-title">Carteira de Clientes</div>
+            <span class="text-xs text-muted">Ordenado por ROAS</span>
+          </div>
+
+          <div class="table-container">
+            <table class="portfolio-table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Investimento</th>
+                  <th>ROAS</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="font-500" style="color:var(--text-primary)">Juliana Costa</div><div class="text-xs text-muted">Infoproduto</div></td>
+                  <td>R$ 5.000</td>
+                  <td><span class="roas-indicator text-gold">6.1x ↑</span></td>
+                  <td><span class="badge badge-approved">Escalando</span></td>
+                </tr>
+                <tr>
+                  <td><div class="font-500" style="color:var(--text-primary)">Marina Lima</div><div class="text-xs text-muted">Serviços</div></td>
+                  <td>R$ 3.500</td>
+                  <td><span class="roas-indicator text-gold">5.3x ↑</span></td>
+                  <td><span class="badge badge-approved">Ativo</span></td>
+                </tr>
+                <tr>
+                  <td><div class="font-500" style="color:var(--text-primary)">Rafael Mendes</div><div class="text-xs text-muted">E-commerce</div></td>
+                  <td>R$ 8.240</td>
+                  <td><span class="roas-indicator text-gold">4.2x →</span></td>
+                  <td><span class="badge badge-approved">Ativo</span></td>
+                </tr>
+                <tr>
+                  <td><div class="font-500" style="color:var(--text-primary)">Paulo Almeida</div><div class="text-xs text-muted">SaaS</div></td>
+                  <td>R$ 12.000</td>
+                  <td><span class="roas-indicator text-gold">3.9x →</span></td>
+                  <td><span class="badge badge-active">Em ajuste</span></td>
+                </tr>
+                <tr>
+                  <td><div class="font-500" style="color:var(--text-primary)">Fernanda Nunes</div><div class="text-xs text-muted">E-commerce</div></td>
+                  <td>R$ 6.800</td>
+                  <td><span class="roas-indicator" style="color:var(--warning)">3.1x →</span></td>
+                  <td><span class="badge badge-active">Monitorando</span></td>
+                </tr>
+                <tr>
+                  <td><div class="font-500" style="color:var(--text-primary)">Pedro Silva</div><div class="text-xs text-muted">Negócio Local</div></td>
+                  <td>R$ 2.000</td>
+                  <td><span class="roas-indicator text-error">2.8x ↓</span></td>
+                  <td><span class="badge badge-revision">Risco</span></td>
+                </tr>
+                <tr style="opacity:0.5">
+                  <td colspan="4" style="text-align:center;font-size:12px;color:var(--text-muted)">+ 8 outros clientes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- AI Analysis -->
+          <div class="card mt-16" style="background:linear-gradient(135deg,var(--bg-card),rgba(212,175,55,0.04));border-color:var(--border-gold)">
+            <div class="flex items-center gap-12 mb-12">
+              <div style="width:34px;height:34px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#000;font-weight:700">IA</div>
+              <div class="font-500" style="font-size:14px">Análise Executiva da Carteira</div>
+              <span class="text-xs text-muted" style="margin-left:auto">Hoje, 08:00</span>
+            </div>
+            <div class="text-sm text-secondary" style="line-height:1.7">
+              Sua carteira tem <strong>ROAS médio de 4.6x</strong>, acima do benchmark de mercado (3.2x). Os 3 clientes top performadores representam 68% da receita da agência. Pedro Silva está em zona crítica — ação imediata recomendada para evitar churn. Oportunidade de upsell com Juliana Costa (+R$2.000/mês de budget identificado).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/sidebar.js"></script>
+<script>
+buildExecutiveSidebar('dashboard');
+
+// MRR Chart
+const ctx1 = document.getElementById('mrrChart').getContext('2d');
+new Chart(ctx1, {
+  type: 'line',
+  data: {
+    labels: ['Nov', 'Dez', 'Jan', 'Fev', 'Mar', 'Abr'],
+    datasets: [{
+      label: 'MRR', data: [22000, 25000, 28500, 31000, 34500, 38600],
+      borderColor: '#D4AF37', backgroundColor: 'rgba(212,175,55,0.08)', borderWidth: 2,
+      tension: 0.4, fill: true, pointBackgroundColor: '#D4AF37', pointRadius: 5
+    }]
+  },
+  options: {
+    responsive: true, plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#5A5550', font: { size: 11 } } },
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#5A5550', font: { size: 11 }, callback: v => 'R$' + (v/1000).toFixed(0) + 'k' }, beginAtZero: false }
+    }
+  }
+});
+
+// Client Pie
+const ctx2 = document.getElementById('clientPieChart').getContext('2d');
+new Chart(ctx2, {
+  type: 'doughnut',
+  data: {
+    labels: ['E-commerce', 'Infoproduto', 'Serviços', 'Local', 'SaaS'],
+    datasets: [{ data: [5, 3, 3, 2, 1], backgroundColor: ['rgba(212,175,55,0.7)','rgba(59,130,246,0.7)','rgba(34,197,94,0.7)','rgba(245,158,11,0.7)','rgba(168,85,247,0.7)'], borderWidth: 0 }]
+  },
+  options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#9A9590', padding: 12, font: { size: 11 } } } }, cutout: '65%' }
+});
+</script>
+</body>
+</html>

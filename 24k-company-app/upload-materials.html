@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24K Company — Upload de Materiais</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .upload-zone-large { border:2px dashed var(--border); border-radius:var(--radius-xl); padding:60px 40px; text-align:center; cursor:pointer; transition:all 0.3s; background:var(--bg-card); position:relative; overflow:hidden; }
+  .upload-zone-large:hover, .upload-zone-large.drag-over { border-color:var(--gold); background:var(--gold-muted); }
+  .upload-icon-large { font-size:56px; opacity:0.4; margin-bottom:20px; }
+  .upload-title { font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:600; margin-bottom:8px; }
+
+  .file-queue { margin-top:24px; }
+  .file-item { display:flex; align-items:center; gap:14px; padding:14px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:8px; }
+  .file-icon { font-size:24px; flex-shrink:0; }
+  .file-info { flex:1; }
+  .file-name { font-size:14px; font-weight:500; color:var(--text-primary); }
+  .file-meta { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .file-progress { margin-top:8px; }
+  .file-actions { display:flex; gap:8px; }
+
+  .client-selector { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; margin-bottom:20px; }
+  .client-select-btn { padding:12px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); text-align:center; cursor:pointer; transition:all 0.2s; font-size:13px; color:var(--text-secondary); font-family:'DM Sans',sans-serif; }
+  .client-select-btn:hover { border-color:var(--gold-border); color:var(--text-primary); }
+  .client-select-btn.selected { border-color:var(--gold); background:var(--gold-muted); color:var(--gold); }
+
+  .type-selector { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+  .type-btn { padding:8px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:99px; font-size:13px; color:var(--text-secondary); cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif; }
+  .type-btn.selected { background:var(--gold-muted); border-color:var(--gold); color:var(--gold); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Upload de Materiais</div>
+        <div class="topbar-subtitle">Envie copies, imagens e vídeos para aprovação do cliente</div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-outline btn-sm" onclick="history.back()">← Voltar</button>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="grid-2" style="align-items:start">
+        <!-- Upload Form -->
+        <div>
+          <div class="card mb-20">
+            <div class="card-title">Para qual cliente?</div>
+            <div class="client-selector">
+              <button class="client-select-btn selected" onclick="selectClient(this)">👤 Rafael Mendes</button>
+              <button class="client-select-btn" onclick="selectClient(this)">👤 Juliana Costa</button>
+              <button class="client-select-btn" onclick="selectClient(this)">👤 Marina Lima</button>
+              <button class="client-select-btn" onclick="selectClient(this)">👤 Pedro Silva</button>
+              <button class="client-select-btn" onclick="selectClient(this)">👤 Paulo Almeida</button>
+              <button class="client-select-btn" onclick="selectClient(this)">👤 Fernanda Nunes</button>
+            </div>
+
+            <div class="card-title">Tipo de Material</div>
+            <div class="type-selector">
+              <button class="type-btn selected" onclick="selectType(this,'copy')">📝 Copy/Texto</button>
+              <button class="type-btn" onclick="selectType(this,'image')">🖼️ Imagem</button>
+              <button class="type-btn" onclick="selectType(this,'video')">🎬 Vídeo</button>
+              <button class="type-btn" onclick="selectType(this,'pdf')">📄 PDF/Relatório</button>
+            </div>
+
+            <!-- Copy Form -->
+            <div id="copy-form">
+              <div class="form-group">
+                <label class="form-label">Nome do Material</label>
+                <input type="text" class="form-control" placeholder="Ex: Copy Feed - Produto Principal v1" id="material-name">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Formato / Posicionamento</label>
+                <select class="form-control" id="material-format">
+                  <option>Feed (imagem/carrossel)</option>
+                  <option>Stories (vídeo/imagem)</option>
+                  <option>Reels</option>
+                  <option>Google Search (anúncio texto)</option>
+                  <option>Google Display (banner)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Headline / Título Principal</label>
+                <input type="text" class="form-control" placeholder="Ex: 🔥 Chega de perder dinheiro em anúncios!" id="headline">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Corpo do Texto</label>
+                <textarea class="form-control" rows="5" placeholder="Texto completo do anúncio..." id="body-text"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">CTA (Call to Action)</label>
+                <input type="text" class="form-control" placeholder="Ex: Quero Escalar →" id="cta">
+              </div>
+            </div>
+
+            <!-- File Form (hidden by default) -->
+            <div id="file-form" style="display:none">
+              <div class="form-group">
+                <label class="form-label">Nome do Material</label>
+                <input type="text" class="form-control" placeholder="Ex: Pack Carrossel - Semana 2 v1" id="file-material-name">
+              </div>
+              <div class="upload-zone-large" onclick="simulateUpload()" id="upload-zone">
+                <div class="upload-icon-large">📂</div>
+                <div class="upload-title">Arraste ou clique para selecionar</div>
+                <div class="text-secondary text-sm">PNG, JPG, MP4, GIF — Máximo 500MB por arquivo</div>
+              </div>
+              <div id="file-list" class="file-queue"></div>
+            </div>
+
+            <div class="form-group mt-16">
+              <label class="form-label">Notas internas (opcional)</label>
+              <textarea class="form-control" rows="2" placeholder="Observações para o cliente ou para a equipe..."></textarea>
+            </div>
+
+            <button class="btn btn-primary btn-lg w-full" onclick="submitMaterial()">
+              Enviar para Aprovação →
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Recent uploads -->
+        <div>
+          <div class="section-header mb-16">
+            <div class="section-title">Materiais Recentes</div>
+            <span class="text-xs text-muted">Últimos 7 dias</span>
+          </div>
+
+          <div class="file-item">
+            <div class="file-icon">📝</div>
+            <div class="file-info">
+              <div class="file-name">Copy Feed - Produto Principal</div>
+              <div class="file-meta">Rafael Mendes · Há 2h · Pendente</div>
+            </div>
+            <span class="badge badge-pending">⏳</span>
+          </div>
+
+          <div class="file-item">
+            <div class="file-icon">🎬</div>
+            <div class="file-info">
+              <div class="file-name">Stories 15s - Oferta Especial</div>
+              <div class="file-meta">Rafael Mendes · Ontem · Pendente</div>
+            </div>
+            <span class="badge badge-pending">⏳</span>
+          </div>
+
+          <div class="file-item">
+            <div class="file-icon">🖼️</div>
+            <div class="file-info">
+              <div class="file-name">Carrossel 4 artes</div>
+              <div class="file-meta">Rafael Mendes · Ontem · Pendente</div>
+            </div>
+            <span class="badge badge-pending">⏳</span>
+          </div>
+
+          <div class="file-item">
+            <div class="file-icon">📝</div>
+            <div class="file-info">
+              <div class="file-name">Copy Carrossel - Educativo</div>
+              <div class="file-meta">Juliana Costa · 3 dias atrás</div>
+              <div class="file-progress mt-8">
+                <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+              </div>
+            </div>
+            <span class="badge badge-approved">✅</span>
+          </div>
+
+          <div class="file-item">
+            <div class="file-icon">📄</div>
+            <div class="file-info">
+              <div class="file-name">Relatório Março - Marina Lima</div>
+              <div class="file-meta">Marina Lima · 5 dias atrás</div>
+            </div>
+            <span class="badge badge-approved">✅</span>
+          </div>
+
+          <div class="file-item">
+            <div class="file-icon">🎬</div>
+            <div class="file-info">
+              <div class="file-name">Reels Depoimento 30s</div>
+              <div class="file-meta">Rafael Mendes · 5 dias atrás</div>
+            </div>
+            <span class="badge badge-revision">🔴 Revisão</span>
+          </div>
+
+          <div class="card mt-20" style="background:linear-gradient(135deg,var(--bg-card),rgba(212,175,55,0.04));border-color:var(--border-gold)">
+            <div class="card-title">💡 Dica da IA</div>
+            <div class="text-sm text-secondary" style="line-height:1.7">Copies com <strong>headline de pergunta</strong> geram em média 23% mais cliques. Considere testar: "Você sabia que [dado impactante]?" para o próximo anúncio do Rafael.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/sidebar.js"></script>
+<script>
+buildTeamSidebar('upload');
+let selectedType = 'copy';
+
+function selectClient(btn) {
+  document.querySelectorAll('.client-select-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function selectType(btn, type) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedType = type;
+  document.getElementById('copy-form').style.display = type === 'copy' ? 'block' : 'none';
+  document.getElementById('file-form').style.display = type !== 'copy' ? 'block' : 'none';
+}
+
+function simulateUpload() {
+  const names = { image: 'arte-feed.jpg', video: 'stories-15s.mp4', pdf: 'relatorio-cliente.pdf' };
+  const filename = names[selectedType] || 'arquivo.jpg';
+  const list = document.getElementById('file-list');
+  list.innerHTML = `
+    <div class="file-item" style="margin-top:12px">
+      <div class="file-icon">${selectedType === 'video' ? '🎬' : selectedType === 'pdf' ? '📄' : '🖼️'}</div>
+      <div class="file-info">
+        <div class="file-name">${filename}</div>
+        <div class="file-meta">Carregando...</div>
+        <div class="file-progress mt-8" id="upload-progress">
+          <div class="progress-bar"><div class="progress-fill" id="upload-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+  `;
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += Math.random() * 20;
+    if (progress >= 100) { progress = 100; clearInterval(interval); document.querySelector('.file-meta').textContent = 'Upload concluído ✓'; }
+    document.getElementById('upload-fill').style.width = progress + '%';
+  }, 200);
+}
+
+function submitMaterial() {
+  const name = document.getElementById('material-name')?.value || document.getElementById('file-material-name')?.value;
+  if (!name) { showToast('Informe o nome do material', 'error'); return; }
+  showToast('Material enviado para aprovação do cliente ✓', 'success');
+  setTimeout(() => history.back(), 2000);
+}
+</script>
+</body>
+</html>

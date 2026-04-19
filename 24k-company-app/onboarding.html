@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24K Company — Onboarding</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body { background: var(--bg-base); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+
+  .onboard-container { width: 100%; max-width: 680px; }
+
+  .onboard-header { text-align: center; margin-bottom: 40px; }
+  .onboard-logo { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; color: var(--gold); letter-spacing: 3px; margin-bottom: 4px; }
+  .onboard-logo-sub { font-size: 10px; letter-spacing: 4px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 32px; }
+
+  /* PROGRESS */
+  .progress-track { display: flex; align-items: center; gap: 0; margin-bottom: 12px; }
+  .step-dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--text-muted); flex-shrink: 0; transition: all 0.3s; }
+  .step-dot.active { border-color: var(--gold); color: var(--gold); background: var(--gold-muted); }
+  .step-dot.done { border-color: var(--success); background: rgba(34,197,94,0.15); color: var(--success); }
+  .step-line { flex: 1; height: 2px; background: var(--border); transition: all 0.3s; }
+  .step-line.done { background: var(--gold-dark); }
+  .step-label { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 8px; }
+
+  /* CARD */
+  .onboard-card { background: var(--bg-card); border: 1px solid var(--border-gold); border-radius: var(--radius-xl); padding: 40px; box-shadow: var(--shadow-gold); }
+
+  /* AI AVATAR */
+  .ai-intro { display: flex; gap: 16px; margin-bottom: 28px; }
+  .ai-avatar { width: 44px; height: 44px; background: linear-gradient(135deg, var(--gold-dark), var(--gold)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; color: #000; font-weight: 700; }
+  .ai-bubble { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 0 var(--radius-lg) var(--radius-lg) var(--radius-lg); padding: 14px 18px; font-size: 15px; color: var(--text-secondary); line-height: 1.6; flex: 1; }
+  .ai-bubble strong { color: var(--text-primary); }
+
+  /* QUESTION */
+  .question-text { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; color: var(--text-primary); margin-bottom: 24px; line-height: 1.3; }
+  .question-num { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; font-weight: 500; }
+
+  /* OPTIONS */
+  .options-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+  .option-btn { padding: 14px 18px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); text-align: left; cursor: pointer; transition: all 0.2s; font-size: 14px; color: var(--text-secondary); font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 12px; }
+  .option-btn:hover { border-color: var(--gold-border); color: var(--text-primary); }
+  .option-btn.selected { border-color: var(--gold); background: var(--gold-muted); color: var(--gold); }
+  .option-letter { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+  .option-btn.selected .option-letter { background: var(--gold); border-color: var(--gold); color: #000; }
+
+  /* INPUT ANSWER */
+  .input-answer { margin-bottom: 28px; }
+
+  /* CREDENTIALS */
+  .cred-item { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+  .cred-platform { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .cred-platform span { font-size: 18px; }
+  .cred-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* NAVIGATION */
+  .onboard-nav { display: flex; justify-content: space-between; align-items: center; }
+
+  /* SUMMARY */
+  .summary-tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: var(--gold-muted); border: 1px solid var(--gold-border); border-radius: 99px; font-size: 12px; color: var(--gold); margin: 4px; }
+  .summary-section { margin-bottom: 24px; }
+  .summary-title { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+  .summary-value { font-size: 15px; color: var(--text-primary); }
+
+  /* TYPING EFFECT */
+  .typing-cursor::after { content: '|'; animation: blink 1s infinite; color: var(--gold); }
+  @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+</style>
+</head>
+<body>
+
+<div class="onboard-container">
+  <!-- Header -->
+  <div class="onboard-header">
+    <div class="onboard-logo">24K</div>
+    <div class="onboard-logo-sub">Company</div>
+  </div>
+
+  <!-- Progress -->
+  <div id="progress-track" class="progress-track">
+    <div class="step-dot active" id="step-1">1</div>
+    <div class="step-line" id="line-1-2"></div>
+    <div class="step-dot" id="step-2">2</div>
+    <div class="step-line" id="line-2-3"></div>
+    <div class="step-dot" id="step-3">3</div>
+    <div class="step-line" id="line-3-4"></div>
+    <div class="step-dot" id="step-4">4</div>
+    <div class="step-line" id="line-4-5"></div>
+    <div class="step-dot" id="step-5">5</div>
+  </div>
+  <div class="step-label" id="step-label">Identificação do Negócio</div>
+
+  <!-- Main Card -->
+  <div class="onboard-card">
+    <!-- AI Bubble -->
+    <div class="ai-intro">
+      <div class="ai-avatar">IA</div>
+      <div class="ai-bubble" id="ai-message">
+        Olá! Sou a IA da <strong>24K Company</strong>. Vou conduzir você por um processo rápido de <strong>10 perguntas</strong> para entendermos profundamente o seu negócio. Isso nos permitirá criar estratégias de tráfego com resultados reais. Vamos começar!
+      </div>
+    </div>
+
+    <!-- Dynamic Content Area -->
+    <div id="step-content">
+      <!-- Content injected by JS -->
+    </div>
+
+    <!-- Navigation -->
+    <div class="onboard-nav">
+      <button class="btn btn-outline" id="btn-back" onclick="prevStep()" style="visibility:hidden">← Anterior</button>
+      <div class="flex gap-8 items-center">
+        <span class="text-muted text-xs" id="step-counter">Etapa 1 de 10</span>
+        <button class="btn btn-primary" id="btn-next" onclick="nextStep()">Próximo →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+const STEPS = [
+  // STEP 1: Persona identification
+  {
+    phase: 1, label: 'Identificação do Negócio',
+    ai: 'Primeiro, vamos entender <strong>qual tipo de negócio você tem</strong>. Isso vai personalizar todas as próximas perguntas para você.',
+    type: 'choice',
+    question: 'Qual melhor descreve o seu negócio?',
+    key: 'persona',
+    options: [
+      { letter: 'A', text: 'E-commerce / Loja Virtual', icon: '🛍️' },
+      { letter: 'B', text: 'Negócio Local (Clínica, Restaurante, Salão...)', icon: '📍' },
+      { letter: 'C', text: 'Prestador de Serviços (Consultor, Advogado...)', icon: '💼' },
+      { letter: 'D', text: 'Infoproduto ou Curso Online', icon: '🎓' },
+      { letter: 'E', text: 'SaaS ou Empresa de Tecnologia', icon: '💻' },
+      { letter: 'F', text: 'Outro', icon: '✦' },
+    ]
+  },
+  // STEP 2: Main channel
+  {
+    phase: 1, label: 'Identificação do Negócio',
+    ai: 'Ótimo! Agora vamos entender <strong>como você vende hoje</strong>. Isso nos ajuda a saber por onde começar.',
+    type: 'choice',
+    question: 'Qual é o seu principal canal de vendas hoje?',
+    key: 'channel',
+    options: [
+      { letter: 'A', text: 'Instagram / Facebook', icon: '📱' },
+      { letter: 'B', text: 'Google (Orgânico ou Pago)', icon: '🔍' },
+      { letter: 'C', text: 'WhatsApp', icon: '💬' },
+      { letter: 'D', text: 'Site próprio', icon: '🌐' },
+      { letter: 'E', text: 'Marketplace (Mercado Livre, Shopee...)', icon: '🏪' },
+      { letter: 'F', text: 'Ainda não tenho canal definido', icon: '🔄' },
+    ]
+  },
+  // STEP 3: Revenue
+  {
+    phase: 1, label: 'Identificação do Negócio',
+    ai: 'Excelente! Saber o <strong>faturamento atual</strong> nos ajuda a calibrar as metas e definir o budget ideal para os anúncios.',
+    type: 'choice',
+    question: 'Qual é o faturamento médio mensal do seu negócio?',
+    key: 'revenue',
+    options: [
+      { letter: 'A', text: 'Até R$ 10.000', icon: '💰' },
+      { letter: 'B', text: 'R$ 10.000 – R$ 50.000', icon: '💰' },
+      { letter: 'C', text: 'R$ 50.000 – R$ 200.000', icon: '💰' },
+      { letter: 'D', text: 'R$ 200.000 – R$ 1.000.000', icon: '💰' },
+      { letter: 'E', text: 'Acima de R$ 1.000.000', icon: '💰' },
+    ]
+  },
+  // STEP 4: Main product
+  {
+    phase: 2, label: 'Produto e Oferta',
+    ai: 'Perfeito. Agora vamos falar do que você <strong>vende e do que dá mais resultado</strong>. Essas informações são fundamentais para criar anúncios que convertem.',
+    type: 'text',
+    question: 'Qual é o seu produto ou serviço principal? E qual tem a maior margem de lucro?',
+    key: 'main_product',
+    placeholder: 'Ex: Vendo curso de culinária online por R$297. Meu produto de maior margem é a mentoria por R$2.000...'
+  },
+  // STEP 5: What to scale
+  {
+    phase: 2, label: 'Produto e Oferta',
+    ai: 'Agora preciso saber: <strong>qual produto ou serviço você quer escalar</strong> com o tráfego pago? Não precisa ser o mais caro — pode ser o mais fácil de vender.',
+    type: 'text',
+    question: 'Qual produto/serviço você quer aumentar as vendas com a 24K Company?',
+    key: 'scale_product',
+    placeholder: 'Ex: Quero escalar o meu curso de R$197, pois tem alta procura e margem boa...'
+  },
+  // STEP 6: Target audience
+  {
+    phase: 2, label: 'Público-alvo',
+    ai: 'Entender o <strong>público-alvo</strong> é um dos pontos mais importantes da estratégia. Quanto mais você descrever, mais precisa será a segmentação.',
+    type: 'text',
+    question: 'Descreva seu cliente ideal: idade, gênero, onde mora, o que faz, o que sente, o que deseja.',
+    key: 'audience',
+    placeholder: 'Ex: Mulheres de 28-45 anos, classe média, moram em capitais, trabalham como CLT e querem empreender, sentem que não têm tempo, desejam liberdade financeira...'
+  },
+  // STEP 7: Objective
+  {
+    phase: 3, label: 'Objetivo de Marketing',
+    ai: 'Qual é o <strong>objetivo principal</strong> que você tem ao contratar a 24K Company? Isso define toda a estratégia de campanha.',
+    type: 'choice',
+    question: 'O que você quer como principal resultado com o tráfego pago?',
+    key: 'objective',
+    options: [
+      { letter: 'A', text: 'Aumentar vendas diretas', icon: '🎯' },
+      { letter: 'B', text: 'Gerar leads qualificados', icon: '📋' },
+      { letter: 'C', text: 'Aumentar seguidores e awareness', icon: '📣' },
+      { letter: 'D', text: 'Retargeting de quem já visitou meu site', icon: '🔁' },
+      { letter: 'E', text: 'Lançamento de um produto novo', icon: '🚀' },
+    ]
+  },
+  // STEP 8: Budget
+  {
+    phase: 3, label: 'Orçamento para Anúncios',
+    ai: 'Agora preciso saber o <strong>budget disponível para investir em anúncios</strong>. Lembrando: esse valor é o investimento em mídia paga, separado dos honorários da 24K Company.',
+    type: 'choice',
+    question: 'Qual é o budget mensal disponível para investir em anúncios (Meta + Google)?',
+    key: 'budget',
+    options: [
+      { letter: 'A', text: 'Até R$ 1.000/mês', icon: '💵' },
+      { letter: 'B', text: 'R$ 1.000 – R$ 5.000/mês', icon: '💵' },
+      { letter: 'C', text: 'R$ 5.000 – R$ 20.000/mês', icon: '💵' },
+      { letter: 'D', text: 'R$ 20.000 – R$ 100.000/mês', icon: '💵' },
+      { letter: 'E', text: 'Acima de R$ 100.000/mês', icon: '💵' },
+    ]
+  },
+  // STEP 9: Ad history
+  {
+    phase: 3, label: 'Histórico com Tráfego',
+    ai: 'Entender se você <strong>já anunciou antes</strong> nos ajuda a saber o ponto de partida e evitar erros já cometidos.',
+    type: 'text',
+    question: 'Você já veiculou anúncios pagos? Se sim, conte o resultado (ROAS, CPA, plataforma). Se não, como é sua situação hoje?',
+    key: 'ad_history',
+    placeholder: 'Ex: Já anunciei no Meta, gastei R$3.000 e tive R$8.000 em vendas. Mas parei porque não tinha gestão profissional...'
+  },
+  // STEP 10: Differentials
+  {
+    phase: 3, label: 'Diferenciais',
+    ai: 'Por último e muito importante: <strong>por que um cliente deve escolher você</strong> e não um concorrente? Esses diferenciais são a matéria-prima dos seus anúncios.',
+    type: 'text',
+    question: 'Quais são os 3 maiores diferenciais competitivos do seu negócio?',
+    key: 'differentials',
+    placeholder: 'Ex: 1) Atendimento 24h via WhatsApp. 2) Garantia de 30 dias ou devolução total. 3) Resultado em 7 dias comprovado...'
+  }
+];
+
+let currentStep = 0;
+let answers = {};
+const labels = ['Identificação do Negócio', 'Produto e Oferta', 'Público-alvo', 'Objetivo de Marketing', 'Credenciais'];
+const phaseMap = { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5 };
+
+function renderStep() {
+  const step = STEPS[currentStep];
+  const content = document.getElementById('step-content');
+  const aiMsg = document.getElementById('ai-message');
+  const counter = document.getElementById('step-counter');
+  const btnBack = document.getElementById('btn-back');
+  const btnNext = document.getElementById('btn-next');
+  const stepLabel = document.getElementById('step-label');
+
+  // Update AI message
+  aiMsg.innerHTML = step.ai;
+
+  // Update counter
+  if (currentStep < STEPS.length) {
+    counter.textContent = `Etapa ${currentStep + 1} de ${STEPS.length}`;
+    stepLabel.textContent = step.label;
+  }
+
+  // Update back button
+  btnBack.style.visibility = currentStep > 0 ? 'visible' : 'hidden';
+
+  // Last step check
+  if (currentStep === STEPS.length - 1) {
+    btnNext.textContent = 'Finalizar Onboarding ✓';
+    btnNext.onclick = finishOnboarding;
+  } else {
+    btnNext.textContent = 'Próximo →';
+    btnNext.onclick = nextStep;
+  }
+
+  // Render content
+  if (step.type === 'choice') {
+    const saved = answers[step.key];
+    content.innerHTML = `
+      <div class="question-num">Pergunta ${currentStep + 1}</div>
+      <div class="question-text">${step.question}</div>
+      <div class="options-grid">
+        ${step.options.map((opt, i) => `
+          <button class="option-btn ${saved === opt.text ? 'selected' : ''}"
+            onclick="selectOption(this, '${step.key}', '${opt.text}')">
+            <span class="option-letter">${opt.letter}</span>
+            <span>${opt.icon} ${opt.text}</span>
+          </button>
+        `).join('')}
+      </div>
+    `;
+  } else if (step.type === 'text') {
+    content.innerHTML = `
+      <div class="question-num">Pergunta ${currentStep + 1}</div>
+      <div class="question-text">${step.question}</div>
+      <div class="input-answer">
+        <textarea class="form-control" id="text-answer" placeholder="${step.placeholder}" rows="5">${answers[step.key] || ''}</textarea>
+      </div>
+    `;
+  }
+
+  updateProgressBar();
+}
+
+function selectOption(btn, key, value) {
+  document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  answers[key] = value;
+}
+
+function nextStep() {
+  const step = STEPS[currentStep];
+
+  // Validate
+  if (step.type === 'text') {
+    const val = document.getElementById('text-answer')?.value?.trim();
+    if (!val) { showToast('Por favor, responda a pergunta para continuar', 'error'); return; }
+    answers[step.key] = val;
+  } else if (step.type === 'choice') {
+    if (!answers[step.key]) { showToast('Selecione uma opção para continuar', 'error'); return; }
+  }
+
+  if (currentStep < STEPS.length - 1) {
+    currentStep++;
+    renderStep();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function prevStep() {
+  if (currentStep > 0) {
+    currentStep--;
+    renderStep();
+  }
+}
+
+function updateProgressBar() {
+  const total = STEPS.length;
+  const phases = [0, 3, 5, 6, 9];
+  // Map step to visual dot
+  const dotIndex = currentStep < 3 ? 1 : currentStep < 5 ? 2 : currentStep < 7 ? 3 : currentStep < 9 ? 4 : 5;
+
+  for (let i = 1; i <= 5; i++) {
+    const dot = document.getElementById('step-' + i);
+    if (i < dotIndex) { dot.className = 'step-dot done'; dot.textContent = '✓'; }
+    else if (i === dotIndex) { dot.className = 'step-dot active'; dot.textContent = i; }
+    else { dot.className = 'step-dot'; dot.textContent = i; }
+  }
+  for (let i = 1; i <= 4; i++) {
+    const line = document.getElementById(`line-${i}-${i+1}`);
+    if (i < dotIndex) line.className = 'step-line done';
+    else line.className = 'step-line';
+  }
+}
+
+function finishOnboarding() {
+  const step = STEPS[currentStep];
+  if (step.type === 'text') {
+    const val = document.getElementById('text-answer')?.value?.trim();
+    if (!val) { showToast('Por favor, responda a última pergunta', 'error'); return; }
+    answers[step.key] = val;
+  }
+
+  // Save
+  localStorage.setItem('24k_onboarded', 'true');
+  localStorage.setItem('24k_onboarding_data', JSON.stringify(answers));
+
+  // Show completing animation
+  const card = document.querySelector('.onboard-card');
+  card.innerHTML = `
+    <div style="text-align:center;padding:40px 20px">
+      <div style="font-size:56px;margin-bottom:24px">✦</div>
+      <div class="ai-intro" style="justify-content:center;margin-bottom:24px">
+        <div class="ai-avatar">IA</div>
+      </div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:32px;margin-bottom:16px;color:var(--gold)">Onboarding Concluído!</h2>
+      <p style="color:var(--text-secondary);margin-bottom:28px;max-width:400px;margin-left:auto;margin-right:auto">Analisei todas as suas respostas. O perfil do seu negócio foi mapeado e nossa equipe já receberá todas as informações para iniciar a estratégia.</p>
+
+      <div style="background:var(--bg-secondary);border:1px solid var(--border-gold);border-radius:var(--radius-lg);padding:24px;text-align:left;margin-bottom:28px">
+        <div class="summary-title">Resumo do Seu Perfil</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+          ${Object.entries(answers).map(([k,v]) => `<span class="summary-tag">✦ ${v.length > 40 ? v.substring(0,40)+'...' : v}</span>`).join('')}
+        </div>
+        <div class="progress-bar" style="margin-top:12px"><div class="progress-fill" style="width:100%"></div></div>
+        <div class="text-xs text-muted mt-8">Perfil 100% mapeado — Pronto para resultados</div>
+      </div>
+
+      <button class="btn btn-primary btn-lg" onclick="window.location.href='client-dashboard.html'" style="width:100%">
+        Acessar Meu Painel →
+      </button>
+    </div>
+  `;
+  document.getElementById('btn-back').style.visibility = 'hidden';
+  document.getElementById('btn-next').style.display = 'none';
+  document.getElementById('step-counter').textContent = 'Concluído!';
+}
+
+function showToast(msg, type = 'gold') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span>${type === 'error' ? '⚠' : '✦'}</span> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+
+// Init
+renderStep();
+</script>
+</body>
+</html>

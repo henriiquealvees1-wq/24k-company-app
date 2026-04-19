@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24K Company — Todos os Clientes</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .search-bar { display:flex; gap:12px; margin-bottom:24px; }
+  .search-bar input { flex:1; }
+  .client-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:16px; }
+  .client-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; transition:all 0.2s; cursor:pointer; }
+  .client-card:hover { border-color:var(--gold-border); transform:translateY(-2px); }
+  .client-card-header { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+  .client-av { width:48px; height:48px; border-radius:50%; background:var(--bg-secondary); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:var(--text-primary); flex-shrink:0; }
+  .client-card-metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border-radius:var(--radius-sm); overflow:hidden; margin-bottom:14px; }
+  .client-card-metric { background:var(--bg-secondary); padding:10px; text-align:center; }
+  .client-card-metric-val { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:var(--text-primary); }
+  .client-card-metric-lbl { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <div id="sidebar-placeholder"></div>
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Todos os Clientes</div>
+        <div class="topbar-subtitle">Carteira completa da 24K Company</div>
+      </div>
+      <div class="topbar-right">
+        <span class="badge badge-gold">14 clientes ativos</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="search-bar">
+        <input type="text" class="form-control" placeholder="Buscar cliente, segmento ou gestor..." oninput="filterClients(this.value)">
+        <select class="form-control" style="width:160px">
+          <option>Todos os status</option>
+          <option>Ativos</option>
+          <option>Atenção</option>
+          <option>Risco de Churn</option>
+        </select>
+        <button class="btn btn-outline">Filtros</button>
+      </div>
+
+      <div class="client-grid" id="client-grid">
+
+        <!-- Clients -->
+        <div class="client-card">
+          <div class="client-card-header">
+            <div class="client-av" style="color:var(--gold);border-color:var(--gold-border)">RM</div>
+            <div style="flex:1">
+              <div class="font-500" style="font-size:15px">Rafael Mendes</div>
+              <div class="text-xs text-muted">E-commerce · Ana Souza</div>
+            </div>
+            <span class="badge badge-approved">Ativo</span>
+          </div>
+          <div class="client-card-metrics">
+            <div class="client-card-metric"><div class="client-card-metric-val">R$8.240</div><div class="client-card-metric-lbl">Invest.</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val text-gold">4.2x</div><div class="client-card-metric-lbl">ROAS</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val text-warning">3</div><div class="client-card-metric-lbl">Pend.</div></div>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-outline btn-sm flex-1">Ver Campanhas</button>
+            <button class="btn btn-ghost btn-sm">💬</button>
+          </div>
+        </div>
+
+        <div class="client-card">
+          <div class="client-card-header">
+            <div class="client-av" style="color:var(--info)">JC</div>
+            <div style="flex:1">
+              <div class="font-500" style="font-size:15px">Juliana Costa</div>
+              <div class="text-xs text-muted">Infoproduto · Ana Souza</div>
+            </div>
+            <span class="badge badge-gold">Escalando</span>
+          </div>
+          <div class="client-card-metrics">
+            <div class="client-card-metric"><div class="client-card-metric-val">R$5.000</div><div class="client-card-metric-lbl">Invest.</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val text-gold">6.1x</div><div class="client-card-metric-lbl">ROAS</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val text-success">0</div><div class="client-card-metric-lbl">Pend.</div></div>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-outline btn-sm flex-1">Ver Campanhas</button>
+            <button class="btn btn-ghost btn-sm">💬</button>
+          </div>
+        </div>
+
+        <div class="client-card">
+          <div class="client-card-header">
+            <div class="client-av" style="color:var(--success)">ML</div>
+            <div style="flex:1">
+              <div class="font-500" style="font-size:15px">Marina Lima</div>
+              <div class="text-xs text-muted">Serviços · Carlos Lima</div>
+            </div>
+            <span class="badge badge-approved">Ativo</span>
+          </div>
+          <div class="client-card-metrics">
+            <div class="client-card-metric"><div class="client-card-metric-val">R$3.500</div><div class="client-card-metric-lbl">Invest.</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val text-gold">5.3x</div><div class="client-card-metric-lbl">ROAS</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val text-warning">2</div><div class="client-card-metric-lbl">Pend.</div></div>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-outline btn-sm flex-1">Ver Campanhas</button>
+            <button class="btn btn-ghost btn-sm">💬</button>
+          </div>
+        </div>
+
+        <div class="client-card" style="border-color:rgba(239,68,68,0.3)">
+          <div class="client-card-header">
+            <div class="client-av" style="color:var(--error)">PS</div>
+            <div style="flex:1">
+              <div class="font-500" style="font-size:15px">Pedro Silva</div>
+              <div class="text-xs text-muted">Negócio Local · Carlos Lima</div>
+            </div>
+            <span class="badge badge-revision">Risco</span>
+          </div>
+          <div class="client-card-metrics">
+            <div class="client-card-metric"><div class="client-card-metric-val">R$2.000</div><div class="client-card-metric-lbl">Invest.</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val text-error">2.8x</div><div class="client-card-metric-lbl">ROAS</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val text-error">3d</div><div class="client-card-metric-lbl">Sem login</div></div>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-danger btn-sm flex-1">Ação Urgente</button>
+            <button class="btn btn-ghost btn-sm">💬</button>
+          </div>
+        </div>
+
+        <div class="client-card">
+          <div class="client-card-header">
+            <div class="client-av" style="color:#A855F7">PA</div>
+            <div style="flex:1">
+              <div class="font-500" style="font-size:15px">Paulo Almeida</div>
+              <div class="text-xs text-muted">SaaS · Ana Souza</div>
+            </div>
+            <span class="badge badge-active">Em ajuste</span>
+          </div>
+          <div class="client-card-metrics">
+            <div class="client-card-metric"><div class="client-card-metric-val">R$12.000</div><div class="client-card-metric-lbl">Invest.</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val text-gold">3.9x</div><div class="client-card-metric-lbl">ROAS</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val text-success">1</div><div class="client-card-metric-lbl">Pend.</div></div>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-outline btn-sm flex-1">Ver Campanhas</button>
+            <button class="btn btn-ghost btn-sm">💬</button>
+          </div>
+        </div>
+
+        <div class="client-card">
+          <div class="client-card-header">
+            <div class="client-av" style="color:#F472B6">FN</div>
+            <div style="flex:1">
+              <div class="font-500" style="font-size:15px">Fernanda Nunes</div>
+              <div class="text-xs text-muted">E-commerce · Marcos Freitas</div>
+            </div>
+            <span class="badge badge-pending">Monitorando</span>
+          </div>
+          <div class="client-card-metrics">
+            <div class="client-card-metric"><div class="client-card-metric-val">R$6.800</div><div class="client-card-metric-lbl">Invest.</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val" style="color:var(--warning)">3.1x</div><div class="client-card-metric-lbl">ROAS</div></div>
+            <div class="client-card-metric"><div class="client-card-metric-val text-warning">2</div><div class="client-card-metric-lbl">Pend.</div></div>
+          </div>
+          <div class="flex gap-8">
+            <button class="btn btn-outline btn-sm flex-1">Ver Campanhas</button>
+            <button class="btn btn-ghost btn-sm">💬</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="text-align:center;margin-top:20px;color:var(--text-muted);font-size:13px">
+        Exibindo 6 de 14 clientes. <a href="#" class="text-gold" onclick="showToast('Carregando todos os clientes...','gold')">Ver todos</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/sidebar.js"></script>
+<script>
+buildExecutiveSidebar('clients');
+
+function filterClients(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('.client-card').forEach(card => {
+    const text = card.textContent.toLowerCase();
+    card.style.display = text.includes(q) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>
